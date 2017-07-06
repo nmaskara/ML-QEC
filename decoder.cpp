@@ -26,7 +26,7 @@ void Decoder::writeErrors(string filename, vector<int> errors,
  */
 void Decoder::match(string infile, string outfile)
 {
-	string b5 = "../blossom5/blossom5";
+	string b5 = "./blossom5/blossom5";
 	string cmd = b5 + " -e " + infile + " -w " + outfile + " >nul";
 	system(cmd.c_str());
 }
