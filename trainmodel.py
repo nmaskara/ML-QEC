@@ -19,8 +19,8 @@ def make_exist(path):
 
 
 if __name__ == "__main__":
-	if (len(sys.argv) != 7):
-		print "usage: type latsize numtrials error_rate numnodes batchsize"
+	if (len(sys.argv) != 9):
+		print "usage: type latsize numtrials error_rate numnodes batchsize learningrate filename"
 		sys.exit()
 	lattype = sys.argv[1]
 	latsize = int(sys.argv[2])
@@ -28,6 +28,8 @@ if __name__ == "__main__":
 	p = float(sys.argv[4])
 	numnodes = int(sys.argv[5])
 	batchsize = int(sys.argv[6])
+	learningrate = float(sys.argv[7])
+	filename = sys.argv[8]
 
 	filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
  	sqdata = np.genfromtxt("data/" + filename + ".csv", delimiter=',')
@@ -38,13 +40,17 @@ if __name__ == "__main__":
 	layer2 = Dense(units=4, activation='softmax')
 	model.add(layer1)
 	model.add(layer2)
-	#sgd = optimizers.SGD(lr=0.1, decay=1e-3)
+	sgd = optimizers.SGD(lr=learningrate)
 	model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
-	early_stopping = EarlyStopping(monitor='val_loss', patience=3)
-	make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
-	filepath = "models/" + filename + "_" + str(numnodes) + "_" + str(batchsize) + \
-			"/{epoch:02d}_{loss:.04f}_{acc:.04f}_{val_loss:.04f}_{val_acc:.4f}.h5"
-	checkpt = ModelCheckpoint(filepath)
-	model.fit(sqdata[:,0:insize], sqdata[:,insize:insize+4], batch_size=batchsize,  \
-		epochs=400, validation_split=0.3, callbacks=[early_stopping, checkpt])
+	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
+	filepath = "models/" + filename + "_" + str(numnodes) + \
+		"_" + str(batchsize) + "_" + str(learningrate) + ".h5"
+	checkpt = ModelCheckpoint(filepath, save_best_only=True)
+	hist = model.fit(sqdata[:,0:insize], sqdata[:,insize:insize+4], batch_size=batchsize,  \
+		epochs=400, validation_split=0.3, callbacks=[early_stopping, checkpt], verbose=1)
+	with open(filename, "a") as myfile:
+		myfile.write(lattype + ", " + str(latsize) + ", " + str(numtrials) + ", " + \
+			str(numnodes) + ", " + str(batchsize) + ", " + str(learningrate) + ", " + \
+			str(max(hist.history['val_acc'])) + "\n")
