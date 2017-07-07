@@ -29,7 +29,7 @@ if __name__ == "__main__":
 	numnodes = int(sys.argv[5])
 	batchsize = int(sys.argv[6])
 	learningrate = float(sys.argv[7])
-	filename = sys.argv[8]
+	outname = sys.argv[8]
 
 	filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
  	sqdata = np.genfromtxt("data/" + filename + ".csv", delimiter=',')
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 	hist = model.fit(sqdata[:,0:insize], sqdata[:,insize:insize+4], batch_size=batchsize,  \
 		epochs=400, validation_split=0.3, callbacks=[early_stopping, checkpt], verbose=1)
-	with open(filename, "a") as myfile:
+	with open(outname, "a") as myfile:
 		myfile.write(lattype + ", " + str(latsize) + ", " + str(numtrials) + ", " + \
 			str(numnodes) + ", " + str(batchsize) + ", " + str(learningrate) + ", " + \
 			str(max(hist.history['val_acc'])) + "\n")

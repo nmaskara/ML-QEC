@@ -1,6 +1,6 @@
 #!/bin/bash
 echo generating data
-./gendata square 3 100000 0.1
+./gendata square 5 100000 0.1
 echo training models
 for learningrate in 0.002 0.01 0.05 0.1 
 do
