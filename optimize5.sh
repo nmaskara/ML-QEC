@@ -9,7 +9,7 @@ do
 		for numnodes in 50 100 200 400
 		do
 			echo training $learningrate $batchsize $numnodes
-			python trainmodel.py square 5 100000 0.1 $numnodes $batchsize $learningrate results5.csv
+			python trainmodel.py square 5 100000 0.1 $numnodes $batchsize $learningrate results/opt5.csv
 		done
 	done
 done
