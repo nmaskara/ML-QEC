@@ -4,8 +4,8 @@ numtrials=1000000
 p=0.05
 ptxt=50
 filename="results.csv"
-#echo generating data
-#./gendata square $latsize $numtrials $p
+echo generating data
+./gendata square $latsize $numtrials $p
 echo training models
 for learningrate in 0.01
 do
