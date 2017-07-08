@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, BatchNormalization, Dropout, advanced_activations
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.regularizers import l2
 from keras import optimizers
@@ -36,12 +36,16 @@ if __name__ == "__main__":
 	
 	insize = latsize * latsize
 	model = Sequential()
-	layer1 = Dense(units=numnodes, activation='relu',input_dim=insize)
-	layer2 = Dense(units=4, activation='softmax')
+	layer1 = Dense(units=numnodes,kernel_initializer='he_normal', input_dim=insize)
+	layer2 = Dense(units=numnodes,kernel_initializer='he_normal')
+	layer3 = Dense(units=4, activation='softmax')
 	model.add(layer1)
-	model.add(layer2)
-	sgd = optimizers.SGD(lr=learningrate)
-	model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+	model.add(BatchNormalization())
+	model.add(Dropout(0.5))
+	model.add(advanced_activations.LeakyReLU())
+	model.add(layer3)
+	sgd = optimizers.SGD(lr=learningrate, nesterov=True)
+	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
 	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
