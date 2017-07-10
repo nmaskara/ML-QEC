@@ -29,9 +29,9 @@ if __name__ == "__main__":
 	numnodes = int(sys.argv[5])
 	batchsize = int(sys.argv[6])
 	learningrate = float(sys.argv[7])
-	outname = sys.argv[8]
-
-	filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
+	#outname = sys.argv[8]
+	filename = sys.argv[8]
+	#filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
  	sqdata = np.genfromtxt("data/" + filename + ".csv", delimiter=',')
 	
 	insize = latsize * latsize
@@ -40,9 +40,9 @@ if __name__ == "__main__":
 	layer2 = Dense(units=numnodes,kernel_initializer='he_normal')
 	layer3 = Dense(units=4, activation='softmax')
 	model.add(layer1)
-	#model.add(BatchNormalization())
+	model.add(BatchNormalization())
 	#model.add(Dropout(0.5))
-	model.add(advanced_activations.LeakyReLU())
+	model.add(Activation('relu'))
 	model.add(layer3)
 	sgd = optimizers.SGD(lr=learningrate, nesterov=True)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
@@ -50,11 +50,7 @@ if __name__ == "__main__":
 	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
 	filepath = "models/" + filename + "_" + str(numnodes) + \
-		"_" + str(batchsize) + "_" + str(learningrate) + ".h5"
+		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 	hist = model.fit(sqdata[:,0:insize], sqdata[:,insize:insize+4], batch_size=batchsize,  \
-		epochs=400, validation_split=0.3, callbacks=[early_stopping, checkpt], verbose=1)
-	with open(outname, "a") as myfile:
-		myfile.write(lattype + ", " + str(latsize) + ", " + str(numtrials) + ", " + \
-			str(numnodes) + ", " + str(batchsize) + ", " + str(learningrate) + ", " + \
-			str(max(hist.history['val_acc'])) + "\n")
+		epochs=1000, validation_split=0.3, callbacks=[early_stopping, checkpt], verbose=1)

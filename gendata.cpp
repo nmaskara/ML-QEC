@@ -11,7 +11,7 @@
 #include <time.h>
 #include <random>
 
-void writeTestData(string fname, string type, int latsize, int numtrials, double p) {
+void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag) {
 	int nrows = latsize;
 	int ncols = latsize;
 	ofstream out(fname);
@@ -25,7 +25,10 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	if (type == "Hexagonal")
 		L = new Hexagonal(nrows, ncols);
 	for (int i = 0; i < numtrials; i++) {
-		if (p < 0)	p = (double) mtrand() / mtrand.max();
+		double p;
+		if (prate < 0)	p = (double) mtrand() / mtrand.max();
+		else if (randflag) p = (double) prate * mtrand() / mtrand.max();
+		else p = prate;
 		L->clear();
 		L->genCorrPairErrs(p, 0);
 		L->checkErrors();
@@ -65,15 +68,24 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 
 
 int main(int argc, char** argv) {
-	if (argc != 5) {
+	if (argc < 5) {
 		cout << "usage: type latsize numtrials error_rate" << endl;
 		abort();
+	}
+	bool randflag = false;
+	string rf = "-r";
+	if (argc == 6 && !rf.compare(argv[5])) {
+		randflag = true;
 	}
 	string type = argv[1];
 	int latsize = atoi(argv[2]);
 	int numtrials = atoi(argv[3]);
 	float error_rate = atof(argv[4]);
 	string filename = "data/" + type + "_" + to_string(latsize) + "_" + to_string(numtrials) + 
-		"_" + to_string(int(error_rate * 1000)) + ".csv";
-	writeTestData(filename, type, latsize, numtrials, error_rate);
+		"_" + to_string(int(error_rate * 1000));
+	if (randflag) {
+		filename += "_random";
+	}
+	filename += ".csv";
+	writeTestData(filename, type, latsize, numtrials, error_rate, randflag);
 }
