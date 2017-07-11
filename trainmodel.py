@@ -62,7 +62,7 @@ if __name__ == "__main__":
 	#model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(layer3)
-	sgd = optimizers.SGD(lr=learningrate, nesterov=True)
+	sgd = optimizers.SGD(lr=learningrate, nesterov=False)
 	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
 	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
