@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 import errno
+import pandas as pd
 
 def make_exist(path):
 	try:
@@ -16,23 +17,36 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
+def genbatches(filename, insize, chsize, batchsize):
+	while True:
+		for chunk in pd.read_csv(filename, chunksize=chsize):
+			#print chunk
+			vals = chunk.values
+			ct = 0
+			while ct < len(chunk):
+				#print chunk[ct:ct+batchsize, 0:insize]
+				yield (vals[ct:ct+batchsize, 0:insize], \
+					vals[ct:ct+batchsize, insize:insize+4])
+				ct += batchsize
+
 
 
 if __name__ == "__main__":
 	if (len(sys.argv) != 9):
-		print "usage: type latsize numtrials error_rate numnodes batchsize learningrate filename"
+		print "usage: type latsize datasize numnodes batchsize learningrate dataname valname"
 		sys.exit()
 	lattype = sys.argv[1]
 	latsize = int(sys.argv[2])
-	numtrials = int(sys.argv[3])
-	p = float(sys.argv[4])
-	numnodes = int(sys.argv[5])
-	batchsize = int(sys.argv[6])
-	learningrate = float(sys.argv[7])
+	datasize = int(sys.argv[3])
+	numnodes = int(sys.argv[4])
+	batchsize = int(sys.argv[5])
+	learningrate = float(sys.argv[6])
 	#outname = sys.argv[8]
-	filename = sys.argv[8]
+	filename = sys.argv[7]
+	valname = sys.argv[8]
+	inname = "data/" + filename + ".csv"
 	#filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
- 	sqdata = np.genfromtxt("data/" + filename + ".csv", delimiter=',')
+ 	sqdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
 	
 	insize = latsize * latsize
 	model = Sequential()
@@ -40,7 +54,11 @@ if __name__ == "__main__":
 	layer2 = Dense(units=numnodes,kernel_initializer='he_normal')
 	layer3 = Dense(units=4, activation='softmax')
 	model.add(layer1)
-	model.add(BatchNormalization())
+	#model.add(BatchNormalization())
+	#model.add(Dropout(0.5))
+	model.add(Activation('relu'))
+	model.add(layer2)
+	#model.add(BatchNormalization())
 	#model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(layer3)
@@ -52,5 +70,6 @@ if __name__ == "__main__":
 	filepath = "models/" + filename + "_" + str(numnodes) + \
 		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
-	hist = model.fit(sqdata[:,0:insize], sqdata[:,insize:insize+4], batch_size=batchsize,  \
-		epochs=1000, validation_split=0.3, callbacks=[early_stopping, checkpt], verbose=1)
+	hist = model.fit_generator(genbatches(inname, insize, 100000, batchsize), datasize/batchsize,  \
+		epochs=1000, callbacks=[early_stopping, checkpt], verbose=1, \
+		validation_data=(sqdata[:,0:insize], sqdata[:,insize:insize+4]))
