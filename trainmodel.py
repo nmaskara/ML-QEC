@@ -32,18 +32,19 @@ def genbatches(filename, insize, chsize, batchsize):
 
 
 if __name__ == "__main__":
-	if (len(sys.argv) != 9):
-		print "usage: type latsize datasize numnodes batchsize learningrate dataname valname"
+	if (len(sys.argv) != 10):
+		print "usage: type learning latsize datasize numnodes batchsize learningrate dataname valname"
 		sys.exit()
 	lattype = sys.argv[1]
-	latsize = int(sys.argv[2])
-	datasize = int(sys.argv[3])
-	numnodes = int(sys.argv[4])
-	batchsize = int(sys.argv[5])
-	learningrate = float(sys.argv[6])
+	opttype = sys.argv[2]
+	latsize = int(sys.argv[3])
+	datasize = int(sys.argv[4])
+	numnodes = int(sys.argv[5])
+	batchsize = int(sys.argv[6])
+	learningrate = float(sys.argv[7])
 	#outname = sys.argv[8]
-	filename = sys.argv[7]
-	valname = sys.argv[8]
+	filename = sys.argv[8]
+	valname = sys.argv[9]
 	inname = "data/" + filename + ".csv"
 	#filename = lattype + "_" + str(latsize) + "_" + str(numtrials) + "_" + str(int(p*1000))
  	sqdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
@@ -62,8 +63,10 @@ if __name__ == "__main__":
 	#model.add(Dropout(0.5))
 	model.add(Activation('relu'))
 	model.add(layer3)
-	sgd = optimizers.SGD(lr=learningrate, nesterov=False)
-	model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+	opt = optimizers.SGD(lr=learningrate, nesterov=False)
+	if (learning == "Adam"):
+		opt = optimizers.Adam()
+	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
 	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
