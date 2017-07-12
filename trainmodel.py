@@ -71,7 +71,7 @@ if __name__ == "__main__":
 	early_stopping = EarlyStopping(monitor='val_loss', patience=10)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
 	filepath = "models/" + filename + "_" + str(numnodes) + \
-		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + ".hdf5"
+		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 	hist = model.fit_generator(genbatches(inname, insize, 100000, batchsize), datasize/batchsize,  \
 		epochs=1000, callbacks=[early_stopping, checkpt], verbose=1, \
