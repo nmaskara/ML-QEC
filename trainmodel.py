@@ -81,7 +81,7 @@ if __name__ == "__main__":
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
 	hist = model.fit_generator(genbatches(inname, insize, 100000, batchsize), datasize/(batchsize),  \
-		epochs=10000, callbacks=[early_stopping, checkpt], verbose=1, \
+		epochs=500, callbacks=[early_stopping, checkpt], verbose=1, \
 		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+4]))
 
 	outpath = "results/" + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \

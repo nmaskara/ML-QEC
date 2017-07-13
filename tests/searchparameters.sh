@@ -1,4 +1,10 @@
 #!/bin/bash -x
+
+if [ $# -eq 0]
+	then
+		echo 'not enough arguments'
+		exit 1
+fi
 lattype='square'
 latsize=3
 p=0.1
