@@ -29,3 +29,4 @@ do
 	's3://nmaskara-models/results/'$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv'
 done
 
+sudo shutdown -h now
