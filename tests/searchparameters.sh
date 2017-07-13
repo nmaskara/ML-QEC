@@ -22,11 +22,11 @@ do
 	python trainmodel.py $lattype 'sgd' $latsize $datasize $numnodes \
 	$numlayers $batchsize $learningrate $dataname $valname
 
-	aws s3 cp 'models/'$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.hdf5' \
-	s3://nmaskara-models/$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.hdf5'
+	aws s3 cp 'models/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$lrtxt'_sgd.hdf5' \
+	s3://nmaskara-models/$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$lrtxt'_sgd.hdf5'
 
-	aws s3 cp 'results/'$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv' \
-	s3://nmaskara-models/results/$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv'
+	aws s3 cp 'results/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$lrtxt'_sgd.csv' \
+	s3://nmaskara-models/results/$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$lrtxt'_sgd.csv'
 done
-
-sudo shutdown -h now
+echo 'here'
+#sudo shutdown -h now

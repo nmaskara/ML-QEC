@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
 	early_stopping = EarlyStopping(monitor='val_loss', patience=5)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
-	filepath = "models/" + filename + "_" + str(numnodes) + \
+	filepath = "models/" + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
