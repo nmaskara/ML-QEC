@@ -26,7 +26,7 @@ do
 	s3://nmaskara-models/$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.hdf5'
 
 	aws s3 cp 'results/'$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv' \
-	's3://nmaskara-models/results/'$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv'
+	s3://nmaskara-models/results/$dataname'_'$numnodes'_'$batchsize'_'$lrtxt'_sgd.csv'
 done
 
 sudo shutdown -h now
