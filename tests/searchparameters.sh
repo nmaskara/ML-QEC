@@ -1,6 +1,5 @@
 #!/bin/bash -x
-
-if [ $# -eq 0]
+if [ $# -eq 0 ]
 	then
 		echo 'not enough arguments'
 		exit 1
