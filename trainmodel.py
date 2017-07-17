@@ -2,7 +2,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, BatchNormalization, Dropout, advanced_activations
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.regularizers import l2
-from keras import optimizers
+from keras import optimizers, initializers
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -33,7 +33,7 @@ def makeModel(input_size, num_nodes, hidden_layers):
 	model = Sequential()
 	layer1 = Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size)
 	model.add(layer1)
-	model.add(Activation('relu'))
+	model.add(Activation('elu'))
 	hidden_layers -= 1
 	while (hidden_layers > 0):
 		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
@@ -46,8 +46,8 @@ def makeModel(input_size, num_nodes, hidden_layers):
 
 
 if __name__ == "__main__":
-	if (len(sys.argv) != 11):
-		print "usage: type opttype latsize datasize numnodes hiddenlayers batchsize learningrate dataname valname"
+	if (len(sys.argv) != 12):
+		print "usage: type opttype latsize datasize numnodes hiddenlayers batchsize learningrate dataname valname date"
 		sys.exit()
 
 	# read inputs
@@ -61,6 +61,7 @@ if __name__ == "__main__":
 	learningrate = float(sys.argv[8])
 	filename = sys.argv[9]
 	valname = sys.argv[10]
+	date = sys.argv[11]
 	inname = "data/" + filename + ".csv"
 
 	if not os.path.isfile("data/" + valname + ".csv"):
@@ -76,7 +77,7 @@ if __name__ == "__main__":
 
 	early_stopping = EarlyStopping(monitor='val_loss', patience=5)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
-	filepath = "models/" + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
+	filepath = "models/" + date + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
@@ -84,7 +85,7 @@ if __name__ == "__main__":
 		epochs=500, callbacks=[early_stopping, checkpt], verbose=1, \
 		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+4]))
 
-	outpath = "results/" + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
+	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".csv"
 	fout = open(outpath, 'w')
 

@@ -5,7 +5,7 @@ if [ $# -eq 0 ]
 		exit 1
 fi
 lattype='square'
-latsize=3
+latsize=5
 p=0.1
 ptxt=100
 
@@ -14,7 +14,7 @@ learningrate=0.01
 lrtxt=10
 numlayers=1
 datasize=$1
-valsize=10001
+valsize=1000000
 
 dt=$(date '+%Y-%m-%d_%H-%M-%S')
 mkdir 'models/'$dt
@@ -27,7 +27,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 ./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 batchsize=$((datasize/1000))
-for numnodes in 50 100 150 200
+for numnodes in 200
 do
 	python trainmodel.py $lattype 'sgd' $latsize $datasize $numnodes \
 	$numlayers $batchsize $learningrate $dataname $valname $dt
