@@ -61,6 +61,9 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 				out << "0, ";
 		}
 		out << endl;
+		if (i % 100000 == 0) {
+			cout << "Generated: " << i << endl;
+		}
 	}
 	out.close();
 	delete L;
