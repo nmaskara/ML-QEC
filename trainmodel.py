@@ -33,7 +33,7 @@ def makeModel(input_size, num_nodes, hidden_layers):
 	model = Sequential()
 	layer1 = Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size)
 	model.add(layer1)
-	model.add(Activation('elu'))
+	model.add(Activation('relu'))
 	hidden_layers -= 1
 	while (hidden_layers > 0):
 		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))

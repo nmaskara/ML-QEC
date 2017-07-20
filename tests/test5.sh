@@ -12,9 +12,9 @@ ptxt=100
 #batchsize=100
 learningrate=0.01
 lrtxt=10
-numlayers=1
+numlayers=2
 datasize=$1
-valsize=1000000
+valsize=100000
 
 dt=$(date '+%Y-%m-%d_%H-%M-%S')
 mkdir 'models/'$dt

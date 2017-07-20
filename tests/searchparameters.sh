@@ -27,7 +27,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 ./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 batchsize=$((datasize/1000))
-for numnodes in 50 100 150 200
+for numnodes in 10 20 30 40 50 60 70 80 90
 do
 	python trainmodel.py $lattype 'sgd' $latsize $datasize $numnodes \
 	$numlayers $batchsize $learningrate $dataname $valname $dt
