@@ -9,6 +9,7 @@ import sys
 import os
 import errno
 import pandas as pd
+import random
 
 def make_exist(path):
 	try:
@@ -22,6 +23,7 @@ def genbatches(filename, insize, chsize, batchsize):
 		for chunk in pd.read_csv(filename, chunksize=chsize):
 			#print chunk
 			vals = chunk.values
+			random.shuffle(vals)
 			ct = 0
 			while ct < len(chunk):
 				#print chunk[ct:ct+batchsize, 0:insize]
@@ -101,7 +103,6 @@ if __name__ == "__main__":
 	fout = open(outpath, 'w')
 
 	count = 0
-	samplerate = 1.0 / valfreq
 	for (loss, acc, val_loss, val_acc) in zip(hist.history['loss'], hist.history['acc'], \
 	hist.history['val_loss'], hist.history['val_acc']):
 		count += 1
