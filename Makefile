@@ -3,12 +3,13 @@ CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
-B5 = ../blossom5
+B5 = blossom5
 BFILES = $(B5)/PerfectMatching.h $(B5)/PMinterface.o
 
-all: $(OBJS) tester.o runtest.o gendata.o
+all: $(OBJS) tester.o runtest.o gendata.o genopendata.o
 	$(CC) $(LFLAGS) -o tester $(OBJS) tester.o
 	$(CC) $(LFLAGS) -o gendata $(OBJS) gendata.o
+	$(CC) $(LFLAGS) -o genopendata $(OBJS) genopendata.o
 	$(CC) $(LFLAGS) -o runtest $(OBJS) runtest.o
 
 Lattice.o: Lattice.hpp Lattice.cpp
@@ -25,6 +26,9 @@ tester.o: tester.cpp
 
 gendata.o: gendata.cpp
 	$(CC) $(CFLAGS) gendata.cpp	
+
+genopendata.o: genopendata.cpp
+	$(CC) $(CFLAGS) genopendata.cpp	
 
 runtest.o: runtest.cpp
 	$(CC) $(CFLAGS) runtest.cpp

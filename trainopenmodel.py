@@ -19,20 +19,6 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genbatches2(filename, insize, chsize, batchsize, latisze):
-	while True:
-		for chunk in pd.read_csv(filename, chunksize=chsize):
-			#print chunk
-			vals = chunk.values
-			random.shuffle(vals)
-			ct = 0
-			while ct < len(chunk):
-				#print chunk[ct:ct+batchsize, 0:insize]
-				newshape = (-1, latsize, latsize, 1)
-				yield (np.reshape(vals[ct:ct+batchsize, 0:insize], newshape), \
-					vals[ct:ct+batchsize, insize:insize+4])
-				ct += batchsize
-
 def genbatches(filename, insize, chsize, batchsize):
 	while True:
 		for chunk in pd.read_csv(filename, chunksize=chsize):
@@ -41,41 +27,10 @@ def genbatches(filename, insize, chsize, batchsize):
 			random.shuffle(vals)
 			ct = 0
 			while ct < len(chunk):
-				#print chunk[ct:ct+batchsize, 0:insize]
+				#print vals[ct:ct+batchsize, insize:insize+1]
 				yield (vals[ct:ct+batchsize, 0:insize], \
-					vals[ct:ct+batchsize, insize:insize+4])
+					vals[ct:ct+batchsize, insize:insize+1])
 				ct += batchsize
-
-def makeModel2(input_size, num_nodes, hidden_layers, opt_type):
-	model = Sequential()
-	filters = 100
-	kernelsize = 3
-	layer1 = convolutional.Conv2D(filters, kernelsize, input_shape=(input_size, input_size, 1))
-	layer2 = Dense(units=num_nodes, kernel_initializer='he_normal')
-	model.add(layer1)
-	model.add(Flatten())
-	model.add(BatchNormalization())
-	model.add(Activation('relu'))
-	model.add(layer2)
-	model.add(BatchNormalization())
-	model.add(Activation('relu'))
-	hidden_layers -= 1
-	while (hidden_layers > 0):
-		hidden_layers -= 1
-		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
-		model.add(BatchNormalization())
-		model.add(Activation('relu'))
-	layer3 = Dense(units=4, activation='softmax')
-	model.add(layer3)
-	if opt_type == 'sgd':
-		opt = optimizers.SGD()
-	elif opt_type == 'adam':
-		opt = optimizers.Adam()
-	else:
-		print 'Invalid optimizer'
-		sys.exit()
-	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-	return model
  
 
 def makeModel(input_size, num_nodes, hidden_layers, opt_type):
@@ -90,7 +45,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type):
 		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
 		model.add(Activation('relu'))
-	layer3 = Dense(units=4, activation='softmax')
+	layer3 = Dense(units=1, activation='sigmoid')
 	model.add(layer3)
 	if opt_type == 'sgd':
 		opt = optimizers.SGD()
@@ -99,7 +54,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type):
 	else:
 		print 'Invalid optimizer'
 		sys.exit()
-	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
 
@@ -121,15 +76,17 @@ if __name__ == "__main__":
 	filename = sys.argv[10]
 	valname = sys.argv[11]
 	date = sys.argv[12]
-	inname = "data/" + filename + ".csv"
+	inname = "data/open_" + filename + ".csv"
 
-	if not os.path.isfile("data/" + valname + ".csv"):
+	if not os.path.isfile("data/open_" + valname + ".csv"):
 		print "Couldn't find validation data"
 		os.system('/gendata square 3 100000 0.1')
 		valname = "data/square_3_100000_100.csv"
- 	valdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
+ 	valdata = np.genfromtxt("data/open_" + valname + ".csv", delimiter=',')
 	
 	insize = latsize * latsize
+
+	print np.sum(valdata[:, insize:insize+1])
 
 	# generate model
 	model = makeModel(insize, numnodes, hiddenlayers, opttype)
@@ -144,7 +101,7 @@ if __name__ == "__main__":
 	hist = model.fit_generator(genbatches(inname, insize, 100000, batchsize),\
 		stepsperepoch,  \
 		epochs=numepochs, callbacks=[early_stopping, checkpt], verbose=1, \
-		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+4]))
+		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+1]))
 
 	#hist = model.fit_generator(genbatches2(inname, insize, 100000, batchsize, latsize),\
 	#	stepsperepoch,  \
