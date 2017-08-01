@@ -48,6 +48,7 @@ def makeModel(latsize, kernel_size, num_filters, num_nodes, hiddenlayers, opt_ty
 		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
 		model.add(Activation('relu'))
+		hiddenlayers -= 1
 	#model.add(pool)
 	#print upsample.output_shape
 	print clayer.output_shape
