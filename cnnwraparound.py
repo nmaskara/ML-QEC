@@ -119,16 +119,16 @@ if __name__ == "__main__":
 
  	early_stopping = EarlyStopping(monitor='loss', patience=10)
 	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
-	filepath = "models/" + date + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".hdf5"
+	filepath = "models/" + date + '/' + filename + "_" + str(numfilters) + "_" + str(numnodes) + '_' \
+		+ str(hiddenlayers) + "_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
 	hist = model.fit_generator(genbatches(inname, latsize, kernelsize, 100000, batchsize), stepsperepoch,\
 		epochs=numepochs, callbacks=[early_stopping, checkpt], verbose=1, \
 		validation_data=(x_val, y_val) )
 
-	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".csv"
+	outpath = "results/" + date + '/' + filename + "_" + str(numfilters) + "_" + str(numnodes) + "_" \
+		+ str(hiddenlayers) + "_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".csv"
 	fout = open(outpath, 'w')
 
 	count = 0
