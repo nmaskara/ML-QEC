@@ -1,12 +1,16 @@
 import numpy as np
 import pandas as pd
-import os
+import os, sys
+
+if len(sys.argv) != 2:
+	print "usage: python csvtohdf5.py dataname"
+	sys.exit(0)
 
 
-filename = 'data/square_7_50000000_100.csv'
-chsize = 1000000
-outfile = 'data/square_7_50000000_100.h5'
-
+filename = 'data/' + sys.argv[1] + '.csv'
+chsize = 1000
+outfile = 'data/' + sys.argv[1] + '.h5'
+'''
 if os.path.exists(outfile):
 	os.remove(outfile)
 
@@ -17,5 +21,10 @@ for df in pd.read_csv(filename, chunksize=chsize):
 	df = pd.DataFrame(data=vals)
 	df.to_hdf(outfile, 'data', format='table', append=True)
 	print 'appended: ' + str(count)
-	count += 1
+	count += 1'''
+
+for (a, b) in zip(pd.read_csv(filename, chunksize=chsize), pd.read_hdf(outfile, chunksize=chsize)):
+	print a
+	print np.unpackbits(b.values, axis=-1)
+	break
 

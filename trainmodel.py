@@ -43,7 +43,7 @@ def genbatches(filename, insize, batchsize):
 		count += batchsize
 		if count > numlines:
 			count = 0
-			random.shuffle(values)
+			#random.shuffle(values)
 
 
 def makeModel2(input_size, num_nodes, hidden_layers, opt_type):
