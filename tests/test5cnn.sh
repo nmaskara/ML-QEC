@@ -1,9 +1,4 @@
 #!/bin/bash -x
-if [ $# -eq 0 ]
-	then
-		echo 'not enough arguments'
-		exit 1
-fi
 lattype='square'
 latsize=7
 p=0.1
@@ -14,11 +9,11 @@ batchsize=1000
 learningrate=0.01
 lrtxt=10
 kernelsize=4
-numfilters=64
+numfilters=4
 numlayers=0
 numnodes=100
 
-datasize=$1
+datasize=50000000
 valsize=100000
 steps=2000
 epochs=500

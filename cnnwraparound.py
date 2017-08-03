@@ -15,31 +15,31 @@ def wrapped(nums, latsize, kernelsize):
 	return nums
 
 
-def genbatches(filename, latsize, kernelsize, chsize, batchsize):
-	insize = latsize * latsize
+def genbatches(filename, latsize, kernelsize, batchsize):
+	df = pd.read_hdf(filename)
+	numlines = len(df.values)
+	values = df.values
+	count = 0
 	while True:
-		for chunk in pd.read_csv(filename, chunksize=chsize):
-			vals = chunk.values
-			random.shuffle(vals)
-			ct = 0
-			while ct < len(chunk):
-				x_batch = wrapped(vals[ct:ct+batchsize, 0:insize], latsize, kernelsize)
-				#x_batch = vals[ct:ct+batchsize, 0:insize]
-				y_batch = vals[ct:ct+batchsize, insize:insize+4]
-
-				yield (x_batch, y_batch)
-				ct += batchsize	
+		dat = np.unpackbits(values[count:count+batchsize], axis=-1)
+		x_batch = wrapped(dat[:, 0:insize], latsize, kernelsize)
+		y_batch = dat[:, insize:insize+4]
+		yield (x_batch, y_batch)
+		count += batchsize
 
 def makeModel(latsize, kernel_size, num_filters, num_nodes, hiddenlayers, opt_type):
 	input_shape = (latsize + kernelsize - 1, latsize + kernelsize - 1, 1)
 	model = Sequential()
 	#upsample = convolutional.UpSampling2D(size=(1.2,1.2),input_shape=(latsize, latsize, 1) )
-	clayer = convolutional.Conv2D(num_filters, kernel_size, input_shape=input_shape)
-	pool = pooling.MaxPooling2D(pool_size=(2,2), padding='same')
+	clayer1 = convolutional.Conv2D(num_filters, kernel_size, input_shape=input_shape)
+	clayer2 = convolutional.Conv2D(num_filters, 1)
+	print numfilters
 	#h1 = Dense(units=num_nodes, kernel_initializer='he_normal')
 	output = Dense(units=4, activation='softmax')
 	#model.add(upsample)
-	model.add(clayer)
+	model.add(clayer1)
+	model.add(Activation('relu'))
+	model.add(clayer2)
 	model.add(Flatten())
 	model.add(BatchNormalization())
 	model.add(Activation('relu'))
@@ -51,7 +51,7 @@ def makeModel(latsize, kernel_size, num_filters, num_nodes, hiddenlayers, opt_ty
 		hiddenlayers -= 1
 	#model.add(pool)
 	#print upsample.output_shape
-	print clayer.output_shape
+	#print clayer.output_shape
 	#print pool.output_shape
 	model.add(output)
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
 	insize = latsize*latsize
 
-	inname = "data/" + filename + ".csv"
+	inname = "data/" + filename + ".h5"
  	valdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
  	x_val = wrapped(valdata[:, 0:insize], latsize, kernelsize)
  	#x_val = valdata[:, 0:insize]
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 		+ str(hiddenlayers) + "_" + str(batchsize) + "_" + str(int(1000*learningrate)) + "_" + opttype + ".hdf5"
 	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
-	hist = model.fit_generator(genbatches(inname, latsize, kernelsize, 100000, batchsize), stepsperepoch,\
+	hist = model.fit_generator(genbatches(inname, latsize, kernelsize, batchsize), stepsperepoch,\
 		epochs=numepochs, callbacks=[early_stopping, checkpt], verbose=1, \
 		validation_data=(x_val, y_val) )
 
