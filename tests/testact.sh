@@ -1,6 +1,6 @@
 #!/bin/bash -x
 lattype='square'
-latsize=5
+latsize=7
 p=0.1
 ptxt=100
 opt='adam'
@@ -8,12 +8,12 @@ opt='adam'
 batchsize=1000
 act='relu'
 numlayers=3
-datasize=1000000
+datasize=50000000
 valsize=100000
 steps=1000
 epochs=500
 
-dt='sq5act_'$(date '+%Y-%m-%d_%H-%M-%S')
+dt='sq7act_'$(date '+%Y-%m-%d_%H-%M-%S')
 mkdir 'models/'$dt
 mkdir 'results/'$dt
 
@@ -24,7 +24,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 #./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #batchsize=$((datasize/1000))
-for numnodes in 60 40 20
+for numnodes in 400
 do
 for act in 'relu' 'sigmoid'
 do

@@ -9,8 +9,8 @@ batchsize=1000
 learningrate=0.01
 lrtxt=10
 kernelsize=4
-numfilters=4
-numlayers=0
+numfilters=64
+numlayers=3
 numnodes=100
 
 datasize=50000000
@@ -29,7 +29,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 #./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #batchsize=$((datasize/1000))
-for numnodes in 60
+for numnodes in 400
 do
 	python cnnwraparound.py $lattype $opt $latsize $steps $epochs $kernelsize $numfilters \
 	$numnodes $numlayers $batchsize $learningrate $dataname $valname $dt

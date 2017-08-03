@@ -85,11 +85,15 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, acttype):
 		hidden_layers -= 1
 		if (first):
 			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size))
-			first = False
 		else:
 			model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
-		model.add(Activation(acttype))
+		if (first):
+			model.add(Activation(acttype))
+		else:
+			model.add(Activation('relu'))
+		if (first):
+			first = False
 	layer3 = Dense(units=4, activation='softmax')
 	model.add(layer3)
 	if opt_type == 'sgd':
