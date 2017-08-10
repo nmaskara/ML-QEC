@@ -129,6 +129,7 @@ if __name__ == "__main__":
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
+		print "Loaded Previous Model"
 		model = load_model(modelpath)
 	else:
 		# otherwise, generate model
@@ -140,6 +141,7 @@ if __name__ == "__main__":
 		toread = open(resultpath, 'r')
 		initial_epoch = len(toread.readlines())
 		toread.close()
+		print "Initial Epoch: " + str(initial_epoch)
 
 	hist = model.fit_generator(genbatches(trainfilename, insize, batchsize),\
 		stepsperepoch,  \

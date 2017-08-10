@@ -4,14 +4,14 @@ lattype='square'
 latsize=9
 p=0.1
 ptxt=100
-opt='sgd'
+opt='adam'
 
-batchsize=1000
-numlayers=7
+batchsize=10
+numlayers=1
 numnodes=60
-datasize=50000000
-valsize=100000
-steps=2500
+datasize=100000
+valsize=10000
+steps=1000
 epochs=100
 
 dt='sq9' #_'$(date '+%Y-%m-%d_%H-%M-%S')
@@ -26,7 +26,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 #./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #batchsize=$((datasize/1000))
-for numnodes in 400 500 600
+for numnodes in 40 80
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $dataname $valname $dt
