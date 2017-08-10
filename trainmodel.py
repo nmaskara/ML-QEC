@@ -1,7 +1,7 @@
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense, Activation, BatchNormalization, Dropout, \
 	advanced_activations, convolutional, Flatten
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
 from keras.regularizers import l2
 from keras import optimizers, initializers
 import numpy as np
@@ -11,26 +11,42 @@ import errno
 import pandas as pd
 import random
 
+
+
+class mycallback(Callback):
+
+	def __init__(self, filename, batchesperepoch):
+		self.filename = filename
+		self.inc = batchesperepoch
+
+
+	def on_train_begin(self, logs=None):
+		filename = self.filename
+		if os.path.isfile(filename):
+			self.outfile = open(filename, 'a')
+		else:
+			self.outfile = open(filename, 'w')		
+
+	def on_train_end(self, logs=None):
+		self.outfile.close()
+		
+	def on_epoch_end(self, epoch, logs=None):
+		self.outfile.write(str(epoch * self.inc) + ',')
+		self.outfile.write(str(logs['loss']) + ',')
+		self.outfile.write(str(logs['acc']) + ',')
+		self.outfile.write(str(logs['val_loss']) + ',')
+		self.outfile.write(str(logs['val_acc']) + ',')
+		self.outfile.write('\n')
+
+
+
+
 def make_exist(path):
 	try:
 		os.makedirs(path)
 	except OSError as exception:
 		if exception.errno != errno.EEXIST:
 			raise
-
-def genbatches2(filename, insize, chsize, batchsize, latisze):
-	while True:
-		for chunk in pd.read_csv(filename, chunksize=chsize):
-			#print chunk
-			vals = chunk.values
-			random.shuffle(vals)
-			ct = 0
-			while ct < len(chunk):
-				#print chunk[ct:ct+batchsize, 0:insize]
-				newshape = (-1, latsize, latsize, 1)
-				yield (np.reshape(vals[ct:ct+batchsize, 0:insize], newshape), \
-					vals[ct:ct+batchsize, insize:insize+4])
-				ct += batchsize
 
 def genbatches(filename, insize, batchsize):
 	df = pd.read_hdf(filename)
@@ -43,42 +59,8 @@ def genbatches(filename, insize, batchsize):
 		count += batchsize
 		if count > numlines:
 			count = 0
-			#random.shuffle(values)
 
-
-def makeModel2(input_size, num_nodes, hidden_layers, opt_type):
-	model = Sequential()
-	filters = 100
-	kernelsize = 3
-	layer1 = convolutional.Conv2D(filters, kernelsize, input_shape=(input_size, input_size, 1))
-	layer2 = Dense(units=num_nodes, kernel_initializer='he_normal')
-	model.add(layer1)
-	model.add(Flatten())
-	model.add(BatchNormalization())
-	model.add(Activation('relu'))
-	model.add(layer2)
-	model.add(BatchNormalization())
-	model.add(Activation('relu'))
-	hidden_layers -= 1
-	while (hidden_layers > 0):
-		hidden_layers -= 1
-		model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
-		model.add(BatchNormalization())
-		model.add(Activation('relu'))
-	layer3 = Dense(units=4, activation='softmax')
-	model.add(layer3)
-	if opt_type == 'sgd':
-		opt = optimizers.SGD()
-	elif opt_type == 'adam':
-		opt = optimizers.Adam()
-	else:
-		print 'Invalid optimizer'
-		sys.exit()
-	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-	return model
- 
-
-def makeModel(input_size, num_nodes, hidden_layers, opt_type, acttype):
+def makeModel(input_size, num_nodes, hidden_layers, opt_type):
 	model = Sequential()
 	first = True
 	while (hidden_layers > 0):
@@ -88,10 +70,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, acttype):
 		else:
 			model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
-		if (first):
-			model.add(Activation(acttype))
-		else:
-			model.add(Activation('relu'))
+		model.add(Activation('relu'))
 		if (first):
 			first = False
 	layer3 = Dense(units=4, activation='softmax')
@@ -108,52 +87,67 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, acttype):
 
 
 if __name__ == "__main__":
-	if (len(sys.argv) != 13):
-		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize learningrate dataname valname date"
+	if (len(sys.argv) != 12):
+		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize dataname valname date"
 		sys.exit()
 
 	# read inputs
 	lattype = sys.argv[1]
 	opttype = sys.argv[2]
-	acttype = sys.argv[3]
-	latsize = int(sys.argv[4])
-	stepsperepoch = int(sys.argv[5])
-	numepochs = int(sys.argv[6])
-	numnodes = int(sys.argv[7])
-	hiddenlayers = int(sys.argv[8])
-	batchsize = int(sys.argv[9])
-	filename = sys.argv[10]
-	valname = sys.argv[11]
-	date = sys.argv[12]
-	inname = "data/" + filename + ".h5"
+	latsize = int(sys.argv[3])
+	stepsperepoch = int(sys.argv[4])
+	numepochs = int(sys.argv[5])
+	numnodes = int(sys.argv[6])
+	hiddenlayers = int(sys.argv[7])
+	batchsize = int(sys.argv[8])
+	filename = sys.argv[9]
+	valname = sys.argv[10]
+	dirname = sys.argv[11]
+	trainfilename = "data/" + filename + ".h5"
+	valfilename = "data/" + valname + ".csv"
 
-	if not os.path.isfile("data/" + valname + ".csv"):
+	if not os.path.isfile(valfilename):
 		print "Couldn't find validation data"
 		sys.exit(0)
+	if not os.path.isfile(trainfilename):
+		print "Couldn't find training data"
  	valdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
 	
 	insize = latsize * latsize
 
-	# generate model
-	model = makeModel(insize, numnodes, hiddenlayers, opttype, acttype)
-	#model = makeModel2(latsize, numnodes, hiddenlayers, opttype)
+	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + ".hdf5"
+	bestmodelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + "_best.hdf5"
+	resultpath = "results/" + dirname + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + ".csv"
+	bestcheckpt = ModelCheckpoint(bestmodelpath, save_best_only=True)
+	lastcheckpt = ModelCheckpoint(modelpath, save_best_only=False)
+	record = mycallback(resultpath, stepsperepoch)
+	#early_stopping = EarlyStopping(monitor='loss', patience=10)
 
-	early_stopping = EarlyStopping(monitor='loss', patience=10)
-	#make_exist("models/" + filename + "_" + str(numnodes) + "_" + str(batchsize))
-	filepath = "models/" + date + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + acttype + "_" + opttype + ".hdf5"
-	checkpt = ModelCheckpoint(filepath, save_best_only=True)
 
-	hist = model.fit_generator(genbatches(inname, insize, batchsize),\
+	# If model already exists, load model
+	if os.path.isfile(modelpath):
+		model = load_model(modelpath)
+	else:
+		# otherwise, generate model
+		model = makeModel(insize, numnodes, hiddenlayers, opttype)
+
+	initial_epoch = 0
+
+	if os.path.isfile(resultpath):
+		toread = open(resultpath, 'r')
+		initial_epoch = len(toread.readlines())
+		toread.close()
+
+	hist = model.fit_generator(genbatches(trainfilename, insize, batchsize),\
 		stepsperepoch,  \
-		epochs=numepochs, callbacks=[early_stopping, checkpt], verbose=1, \
+		epochs=numepochs, initial_epoch=initial_epoch, \
+		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
 		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+4]))
 
-	#hist = model.fit_generator(genbatches2(inname, insize, 100000, batchsize, latsize),\
-	#	stepsperepoch,  \
-	#	epochs=numepochs, callbacks=[early_stopping, checkpt], verbose=1, \
-	#	validation_data=(np.reshape(valdata[:,0:insize], (-1, latsize, latsize, 1)), valdata[:,insize:insize+4]))
-
+	'''
 	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + acttype + "_" + opttype + ".csv"
 	fout = open(outpath, 'w')
@@ -168,4 +162,4 @@ if __name__ == "__main__":
 		fout.write(str(val_loss) + ', ')
 		fout.write(str(val_acc) + ', ')
 		fout.write('\n')
-	fout.close()
+	fout.close()'''
