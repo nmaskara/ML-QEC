@@ -14,7 +14,7 @@ valsize=100000
 steps=2500
 epochs=100
 
-dt='sq5resumetest' #_'$(date '+%Y-%m-%d_%H-%M-%S')
+dt='sq9' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
 	mkdir 'models/'$dt
 fi
