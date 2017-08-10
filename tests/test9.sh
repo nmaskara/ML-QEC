@@ -7,7 +7,7 @@ ptxt=100
 opt='adam'
 
 batchsize=10
-numlayers=1
+numlayers=7
 numnodes=60
 datasize=100000
 valsize=10000
@@ -26,7 +26,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 #./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #batchsize=$((datasize/1000))
-for numnodes in 40 80
+for numnodes in 400 500 600
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $dataname $valname $dt
