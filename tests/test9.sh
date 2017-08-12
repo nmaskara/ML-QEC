@@ -6,12 +6,12 @@ p=0.1
 ptxt=100
 opt='adam'
 
-batchsize=10
+batchsize=1000
 numlayers=7
 numnodes=60
-datasize=100000
-valsize=10000
-steps=1000
+datasize=50000000
+valsize=100000
+steps=2500
 epochs=100
 
 dt='sq9' #_'$(date '+%Y-%m-%d_%H-%M-%S')

@@ -48,11 +48,11 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genbatches(filename, insize, batchsize):
+def genbatches(filename, insize, batchsize, initial_epoch, stepsperepoch):
 	df = pd.read_hdf(filename)
 	numlines = len(df.values)
 	values = df.values
-	count = 0
+	count = (initial_epoch * stepsperepoch * batchsize) % numlines
 	while True:
 		dat = np.unpackbits(values[count:count+batchsize], axis=-1)
 		yield dat[:, 0:insize], dat[:, insize:insize+4]
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 
-	hist = model.fit_generator(genbatches(trainfilename, insize, batchsize),\
+	hist = model.fit_generator(genbatches(trainfilename, insize, batchsize, initial_epoch, stepsperepoch),\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
 		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
