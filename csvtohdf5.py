@@ -8,7 +8,7 @@ if len(sys.argv) != 2:
 
 
 filename = 'data/' + sys.argv[1] + '.csv'
-chsize = 1000
+chsize = 100000
 outfile = 'data/' + sys.argv[1] + '.h5'
 
 if os.path.exists(outfile):
