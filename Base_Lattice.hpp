@@ -56,7 +56,7 @@ public:
 	void checkErrors();
 	// applies a matching to the lattice by connecting all qubits 
 	// between each pair
-	void applyCorrection(pairlist matching);
+	virtual void applyCorrection(pairlist matching);
 
 	void clear();
 

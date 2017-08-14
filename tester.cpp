@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Lattice.hpp"
 #include "Triangle.hpp"
+#include "Triangle_ColorCode.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
 #include <assert.h>
@@ -62,24 +63,25 @@ void testnum() {
 
 void simpletest(string dirname = "", string filename = "") {
 
-	int nrows = 8;
-	int ncols = 8;
-	Triangle L(nrows, ncols);
+	int nrows = 3;
+	int ncols = 3;
+	Triangle_ColorCode L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
 	do {
 	ofstream out(dirname + filename + "_info.txt");
-	//L.generateErrors(0.1);
-	L.genCorrPairErrs(0,0.02);
+	L.generateErrors(0.01);
+	//L.genCorrPairErrs(0,0.02);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);
 	L.printErrors(cout);
 	L.printLattice(cout);	
 	Decoder D;
-	vector< pair<int, int> > matching = D.decode(L.getErrors(), L.calcErrDistances(),
-		dirname + filename + "_edges.txt", 
-		dirname + filename + "_matched.txt");
+	//vector< pair<int, int> > matching = D.decode(L.getErrors(), L.calcErrDistances(),
+	//	dirname + filename + "_edges.txt", 
+	//	dirname + filename + "_matched.txt");
+	pairlist matching;
 	L.applyCorrection(matching);
 	L.checkErrors();
 	L.printLattice(out);
@@ -90,12 +92,12 @@ void simpletest(string dirname = "", string filename = "") {
 	L.printLattice(cout);
 	assert((L.getErrors()).size() == 0);
 	cout << "Correction: " << L.checkCorrection() << endl;
-	} while (L.checkCorrection());
+	} while (!L.checkCorrection());
 	L.printLattice(cout);
 }
 
 int main(int argc, char** argv) {
-	//simpletest();
+	simpletest();
 	//testnum();
 
 	/*Hexagonal L(16, 16);
@@ -115,8 +117,11 @@ int main(int argc, char** argv) {
  	}*/
 
 
-	/*Triangle  L(16, 16);
-	L.genCorrPairErrs(0, 0.2);
+	/*Triangle_ColorCode  L(9, 9);
+	L.check[74] = 1;
+	L.printLattice();
+	pairlist matching;
+	L.applyCorrection(matching);
 	L.checkErrors();
 	L.printLattice();
 	cout << L.getErrors().size() << endl;*/

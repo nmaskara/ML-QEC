@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Lattice.hpp"
 #include "Triangle.hpp"
+#include "Triangle_ColorCode.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
 #include <assert.h>
@@ -24,16 +25,20 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L = new Triangle(nrows, ncols);
 	if (type == "Hexagonal")
 		L = new Hexagonal(nrows, ncols);
+	if (type == "cc")
+		L = new Triangle_ColorCode(nrows, ncols);
 	for (int i = 0; i < numtrials; i++) {
 		double p;
 		if (prate < 0)	p = (double) mtrand() / mtrand.max();
 		else if (randflag) p = (double) prate * mtrand() / mtrand.max();
 		else p = prate;
 		L->clear();
-		L->genCorrPairErrs(p, 0);
+		L->generateErrors(p);
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
-		pairlist matching = D.matchTopLeft(L->getErrors());
+		pairlist matching;
+		if (type != "cc")
+			pairlist matching = D.matchTopLeft(L->getErrors());
 		//L.printLattice();
 		L->applyCorrection(matching);
 		int r2 = L->checkCorrection();
@@ -54,7 +59,12 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		for (int i = 0; i < L->nerrs; i++) {
 			out << errors[i] << ", ";
 		}
-		for (int i = 0; i < 4; i++) {
+		int numcat;
+		if (type == "cc")
+			numcat = 16;
+		else
+			numcat = 4;
+		for (int i = 0; i < numcat; i++) {
 			if (result == i)
 				out << "1, ";
 			else 

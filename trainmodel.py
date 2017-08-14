@@ -11,8 +11,6 @@ import errno
 import pandas as pd
 import random
 
-
-
 class mycallback(Callback):
 
 	def __init__(self, filename, batchesperepoch):
@@ -48,19 +46,19 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genbatches(filename, insize, batchsize, initial_epoch, stepsperepoch):
+def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch):
 	df = pd.read_hdf(filename)
 	numlines = len(df.values)
 	values = df.values
 	count = (initial_epoch * stepsperepoch * batchsize) % numlines
 	while True:
 		dat = np.unpackbits(values[count:count+batchsize], axis=-1)
-		yield dat[:, 0:insize], dat[:, insize:insize+4]
+		yield dat[:, 0:insize], dat[:, insize:insize+numcat]
 		count += batchsize
 		if count > numlines:
 			count = 0
 
-def makeModel(input_size, num_nodes, hidden_layers, opt_type):
+def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	model = Sequential()
 	first = True
 	while (hidden_layers > 0):
@@ -73,7 +71,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type):
 		model.add(Activation('relu'))
 		if (first):
 			first = False
-	layer3 = Dense(units=4, activation='softmax')
+	layer3 = Dense(units=numcat, activation='softmax')
 	model.add(layer3)
 	if opt_type == 'sgd':
 		opt = optimizers.SGD()
@@ -125,7 +123,10 @@ if __name__ == "__main__":
 	lastcheckpt = ModelCheckpoint(modelpath, save_best_only=False)
 	record = mycallback(resultpath, stepsperepoch)
 	#early_stopping = EarlyStopping(monitor='loss', patience=10)
-
+	if (lattype == "cc"):
+		numcat = 16
+	else:
+		numcat = 4
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
@@ -133,7 +134,7 @@ if __name__ == "__main__":
 		model = load_model(modelpath)
 	else:
 		# otherwise, generate model
-		model = makeModel(insize, numnodes, hiddenlayers, opttype)
+		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
 
 	initial_epoch = 0
 
@@ -143,11 +144,11 @@ if __name__ == "__main__":
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 
-	hist = model.fit_generator(genbatches(trainfilename, insize, batchsize, initial_epoch, stepsperepoch),\
+	hist = model.fit_generator(genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch),\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
 		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
-		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+4]))
+		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+numcat]))
 
 	'''
 	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \

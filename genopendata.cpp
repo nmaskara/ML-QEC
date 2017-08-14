@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <random>
+#include <string>
 
 void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag) {
 	int nrows = latsize+1;
@@ -65,8 +66,8 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 
 		L->printLattice();
 		cout << abv << "\t" << bel << "\t" << left << "\t" << right << "\t" << endl;
-		for (int i = 0; i < latsize * latsize; i++) {
-			out << errors[i] << ", ";
+		for (int k = 0; k < latsize * latsize; k++) {
+			out << errors[k] << ", ";
 			//cout << errors[i] << ", ";
 		}
 		if (abv)	out << "1, ";
