@@ -1,18 +1,18 @@
 #!/bin/bash -x
 
-lattype='square'
+lattype='cc'
 latsize=5
 p=0.1
 ptxt=100
-opt='sgd'
+opt='adam'
 
 batchsize=1000
 numlayers=3
-numnodes=60
+numnodes=100
 datasize=20000000
 valsize=100000
 steps=1000
-epochs=20
+epochs=200
 
 dt='sq5resumetest' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
@@ -21,13 +21,14 @@ fi
 if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
-#./gendata $lattype $latsize $valsize $p
+./gendata $lattype $latsize $valsize $p
 valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 
-#./gendata $lattype $latsize $datasize $p
+./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
+python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
-for numlayers in 1 2 3
+for numlayers in 3 2 1
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $dataname $valname $dt
