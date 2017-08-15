@@ -8,7 +8,7 @@ using namespace std;
  */
 void Decoder::writeErrors(string filename, vector<int> errors, 
 	vector<int> distances) {
-
+	assert(distances.size() == (errors.size()-1) * errors.size() / 2);
 	ofstream out (filename.c_str());
 	int count = 0;
 	out << errors.size() << " " << distances.size() << endl;
@@ -51,6 +51,7 @@ vector< pair<int, int> > Decoder::readMatching(string errfile, vector<int> error
 vector< pair<int, int> > Decoder::decode(vector<int> errors, vector<int> dists, string dfile, 
 	string mfile) {
 	vector< pair<int, int> > matching;
+	assert(errors.size() % 2 == 0);
 	if (errors.size() == 0)
 		return matching;
 	writeErrors(dfile, errors, dists);
@@ -98,7 +99,12 @@ pairlist Decoder::matchTopLeft(vector<int> errors) {
 int Decoder::runDecode(Base_Lattice &L, string dfile, string mfile) {
 	L.checkErrors();
 	vector<int> errs = L.getErrors();
+	if (errs.size() % 2 == 1) {
+		errs.push_back(-1);
+	}
+	//cout << errs.size() << endl;
 	vector<int> dists = L.calcErrDistances();
+	//cout << dists.size() << endl;
 	if (dists.size() == 0)
 		return L.checkCorrection();
 	//cout << type << endl;

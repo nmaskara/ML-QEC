@@ -59,12 +59,16 @@ vector<int> Base_Lattice::getErrors() {
 vector<int> Base_Lattice::calcErrDistances() {
 	vector<int> distances;
 	vector<int> errors = getErrors();
+	if (errors.size() % 2 == 1)
+		errors.push_back(-1);
 	for (uint i = 0; i < errors.size(); i++) {
 		for (uint j = i+1; j < errors.size(); j++) {
 			int dist = calcDist(errors[i], errors[j]);	
+			//cout << dist << ": " << i << ", " << j << ":: ";
 			distances.push_back(dist);
 		}
 	}
+	cout << endl;
 	return distances;
 }
 

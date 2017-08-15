@@ -1,4 +1,4 @@
-OBJS = Lattice.o decoder.o Base_Lattice.o Triangle.o Hexagonal.o Triangle_ColorCode.o
+OBJS = Lattice.o decoder.o Base_Lattice.o Triangle.o Hexagonal.o Triangle_ColorCode.o Lattice2.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c $(DEBUG)

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Lattice.hpp"
+#include "Lattice2.hpp"
 #include "Triangle.hpp"
 #include "Triangle_ColorCode.hpp"
 #include "Hexagonal.hpp"
@@ -63,14 +64,14 @@ void testnum() {
 
 void simpletest(string dirname = "", string filename = "") {
 
-	int nrows = 3;
-	int ncols = 3;
-	Triangle_ColorCode L(nrows, ncols);
+	int nrows = 9;
+	int ncols = 9;
+	Lattice2 L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
 	do {
 	ofstream out(dirname + filename + "_info.txt");
-	L.generateErrors(0.01);
+	L.generateErrors(0.1);
 	//L.genCorrPairErrs(0,0.02);
 	L.checkErrors();
 	L.printErrors(out);
@@ -78,12 +79,14 @@ void simpletest(string dirname = "", string filename = "") {
 	L.printErrors(cout);
 	L.printLattice(cout);	
 	Decoder D;
+	D.runDecode(L, dirname + filename + "_edges.txt", dirname + filename + "_matched.txt");
+
 	//vector< pair<int, int> > matching = D.decode(L.getErrors(), L.calcErrDistances(),
 	//	dirname + filename + "_edges.txt", 
 	//	dirname + filename + "_matched.txt");
-	pairlist matching;
-	L.applyCorrection(matching);
-	L.checkErrors();
+	//pairlist matching;
+	//L.applyCorrection(matching);
+	//L.checkErrors();
 	L.printLattice(out);
 	//L.printLattice(cout);
 	L.printErrors(out);
@@ -116,9 +119,14 @@ int main(int argc, char** argv) {
 		}
  	}*/
 
+	//Lattice2 L(9,9);
+	//L.data[8].err = true;
+	//L.data[7].err = true;
+	//L.printLattice();
+	//cout << L.checkCorrection() << endl;
 
 	/*Triangle_ColorCode  L(9, 9);
-	L.check[74] = 1;
+	L.check[4] = 1;
 	L.printLattice();
 	pairlist matching;
 	L.applyCorrection(matching);
