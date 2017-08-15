@@ -11,6 +11,8 @@ import errno
 import pandas as pd
 import random
 
+regfac = 0.0001
+
 class mycallback(Callback):
 
 	def __init__(self, filename, batchesperepoch):
@@ -64,9 +66,9 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	while (hidden_layers > 0):
 		hidden_layers -= 1
 		if (first):
-			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size, kernel_regularizer=l2(0.01)))
+			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size, kernel_regularizer=l2(regfac)))
 		else:
-			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', kernel_regularizer=l2(0.01)))
+			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', kernel_regularizer=l2(regfac)))
 		model.add(BatchNormalization())
 		model.add(Activation('relu'))
 		if (first):
