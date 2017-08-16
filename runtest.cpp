@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <vector>
 #include "Lattice.hpp"
+#include "Lattice2.hpp"
 #include "Triangle.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
@@ -72,6 +73,8 @@ void runtest(string finame, string foname) {
 			L = new Triangle(latsize,latsize);
 		if (latticetype == "hexagonal") 
 			L = new Hexagonal(latsize, latsize);
+		if (latticetype == "surface")
+			L = new Lattice2(latsize, latsize);
 		Decoder D(decodertype);
 		while(stream >> p) {
 			nfailed = 0;

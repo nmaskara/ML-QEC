@@ -71,7 +71,7 @@ void simpletest(string dirname = "", string filename = "") {
 	if (filename == "")	filename = "last";
 	do {
 	ofstream out(dirname + filename + "_info.txt");
-	L.generateErrors(0.1);
+	L.generateErrors(0.05);
 	//L.genCorrPairErrs(0,0.02);
 	L.checkErrors();
 	L.printErrors(out);

@@ -68,7 +68,7 @@ vector<int> Base_Lattice::calcErrDistances() {
 			distances.push_back(dist);
 		}
 	}
-	cout << endl;
+	//cout << endl;
 	return distances;
 }
 

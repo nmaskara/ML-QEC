@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Lattice.hpp"
+#include "Lattice2.hpp"
 #include "Triangle.hpp"
 #include "Triangle_ColorCode.hpp"
 #include "Hexagonal.hpp"
@@ -27,6 +28,9 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L = new Hexagonal(nrows, ncols);
 	if (type == "cc")
 		L = new Triangle_ColorCode(nrows, ncols);
+	if (type == "surface")
+		L = new Lattice2(nrows, ncols);
+
 	for (int i = 0; i < numtrials; i++) {
 		double p;
 		if (prate < 0)	p = (double) mtrand() / mtrand.max();
@@ -39,29 +43,38 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		pairlist matching;
 		if (type != "cc")
 			pairlist matching = D.matchTopLeft(L->getErrors());
-		//L.printLattice();
-		L->applyCorrection(matching);
-		int r2 = L->checkCorrection();
-		/*if (L.getErrors().size() == 0) {
-			cout << r2 << endl;
-			if (r2 != 0){
-				L.printLattice(cout);
-				abort();
-			}
-		}*/
-		L->checkErrors();
-		assert(L->getErrors().size() == 0);
-		int result = L->checkCorrection();
-		assert(result == r2);
-		//L.printLattice();
-		///cout << result << endl;
-		//cout << L.nerrs << endl;
+		int result;
+		if (type == "surface") {
+			result = L->checkCorrection();
+		}
+		else {
+			//L.printLattice();
+			L->applyCorrection(matching);
+			int r2 = L->checkCorrection();
+			/*if (L.getErrors().size() == 0) {
+				cout << r2 << endl;
+				if (r2 != 0){
+					L.printLattice(cout);
+					abort();
+				}
+			}*/
+			L->checkErrors();
+			assert(L->getErrors().size() == 0);
+			result = L->checkCorrection();			
+			assert(result == r2);
+			//L.printLattice();
+			///cout << result << endl;
+			//cout << L.nerrs << endl;
+		}
+
 		for (int i = 0; i < L->nerrs; i++) {
 			out << errors[i] << ", ";
 		}
 		int numcat;
 		if (type == "cc")
 			numcat = 16;
+		else if (type == "surface")
+			numcat = 2;
 		else
 			numcat = 4;
 		for (int i = 0; i < numcat; i++) {

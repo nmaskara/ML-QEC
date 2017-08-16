@@ -66,10 +66,11 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	while (hidden_layers > 0):
 		hidden_layers -= 1
 		if (first):
-			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size, kernel_regularizer=l2(regfac)))
+			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', input_dim=input_size))
 		else:
-			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', kernel_regularizer=l2(regfac)))
+			model.add(Dense(units=num_nodes, kernel_initializer='he_normal', ))
 		model.add(BatchNormalization())
+		model.add(Dropout(0.5))
 		model.add(Activation('relu'))
 		if (first):
 			first = False
