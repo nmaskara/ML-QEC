@@ -66,7 +66,7 @@ void simpletest(string dirname = "", string filename = "") {
 
 	int nrows = 9;
 	int ncols = 9;
-	Lattice2 L(nrows, ncols);
+	Lattice L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
 	do {
@@ -148,6 +148,4 @@ int main(int argc, char** argv) {
 	L.applyCorrection(matching);
 	L.checkErrors();
 	L.printLattice(cout);*/
-
-
 }

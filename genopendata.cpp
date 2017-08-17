@@ -21,10 +21,16 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	mt19937 mtrand;
 	if (type == "square")
 		L = new Lattice(nrows, ncols);
-	if (type == "triangle")
+	else if (type == "triangle")
 		L = new Triangle(nrows, ncols);
-	if (type == "Hexagonal")
+	else if (type == "Hexagonal")
 		L = new Hexagonal(nrows, ncols);
+	else {
+		L = new Base_Lattice(nrows, ncols);
+		cout << "unsupported type " << type << endl;
+		abort();
+	}
+
 	for (int i = 0; i < numtrials; i++) {
 		double p;
 		if (prate < 0)	p = (double) mtrand() / mtrand.max();
@@ -63,21 +69,17 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 			if (dat[nrows * ncols + L->rctoi(r, latsize)].err)
 				left = !left;
 		}
-
-		L->printLattice();
-		cout << abv << "\t" << bel << "\t" << left << "\t" << right << "\t" << endl;
+		int result = 8*abv + 4*bel + 2*left + right;
+		//L->printLattice();
+		//cout << abv << "\t" << bel << "\t" << left << "\t" << right << "\t" << endl;
 		for (int k = 0; k < latsize * latsize; k++) {
 			out << errors[k] << ", ";
 			//cout << errors[i] << ", ";
 		}
-		if (abv)	out << "1, ";
-		else		out << "0, ";
-		if (bel)	out << "1, ";
-		else		out << "0, ";
-		if (left)	out << "1, ";
-		else		out << "0, ";
-		if (right)	out << "1, ";
-		else		out << "0, ";
+		for (int k = 0; k < 16; k++) {
+			if (k == result)	out << "1, ";
+			else				out << "0, ";
+		}
 		out << endl;
 		if ((i+1) % 100000 == 0) {
 			cout << "Generated: " << i << endl;

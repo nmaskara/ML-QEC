@@ -101,6 +101,7 @@ if __name__ == "__main__":
 	filename = sys.argv[9]
 	valname = sys.argv[10]
 	dirname = sys.argv[11]
+
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
 
@@ -125,6 +126,10 @@ if __name__ == "__main__":
 	#early_stopping = EarlyStopping(monitor='loss', patience=10)
 	if (lattype == "cc"):
 		numcat = 16
+	elif (lattype == "open_square"):
+		numcat = 16
+	elif (lattype == "surface"):
+		numcat = 2
 	else:
 		numcat = 4
 
@@ -144,6 +149,7 @@ if __name__ == "__main__":
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 
+	print numcat
 	hist = model.fit_generator(genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch),\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
