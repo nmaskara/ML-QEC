@@ -31,6 +31,8 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	if (type == "surface")
 		L = new Lattice2(nrows, ncols);
 
+	clock_t start = clock();
+
 	for (int i = 0; i < numtrials; i++) {
 		double p;
 		if (prate < 0)	p = (double) mtrand() / mtrand.max();
@@ -42,7 +44,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		vector<int> errors = L->getCheck();
 		pairlist matching;
 		if (type != "cc")
-			pairlist matching = D.matchTopLeft(L->getErrors());
+			matching = D.matchTopLeft(L->getErrors());
 		int result;
 		if (type == "surface") {
 			result = L->checkCorrection();
@@ -90,6 +92,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	}
 	out.close();
 	delete L;
+	cout << "Total Time: " << clock() - start << endl;
 }
 
 

@@ -1,6 +1,6 @@
-perfect matching with 290 nodes and 41905 edges
-    starting init...done [0.003 secs]. 6 trees
-    .4.2.0.
-done [0.007 secs]. 79 grows, 0 expands, 46 shrinks
-    expands: [0.000 secs], shrinks: [0.001 secs], dual updates: [0.000 secs]
-cost = 180.0
+perfect matching with 18 nodes and 153 edges
+    starting init...done [0.000 secs]. 0 trees
+    .
+done [0.000 secs]. 0 grows, 0 expands, 0 shrinks
+    expands: [0.000 secs], shrinks: [0.000 secs], dual updates: [0.000 secs]
+cost = 10.0

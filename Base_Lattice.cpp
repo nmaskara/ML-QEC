@@ -133,6 +133,7 @@ void Base_Lattice::applyCorrection(pairlist matching) {
 		vector<int> path = calcMinPath(x, y); 
 		for (uint k = 0; k < path.size(); k++) {
 			int index = path[k];
+			assert(index < ndats);
 			data[index].err = !data[index].err;
 		}		
 	}
