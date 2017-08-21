@@ -24,6 +24,8 @@ if os.path.exists(outname):
 
 added = 0
 chsize = 100000
+if (datasize < incsize):
+	incsize = datasize
 while (added < datasize):
 	os.system('./gendata ' + sys.argv[1] + ' ' + sys.argv[2] + ' ' + str(incsize) + ' ' + sys.argv[4])
 	for df in pd.read_csv(inname, chunksize=chsize):

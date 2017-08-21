@@ -1,20 +1,20 @@
 #!/bin/bash -x
 
-lattype='cc'
-latsize=3
-p=0.08
-ptxt=80
-opt='adam'
+lattype=$1
+latsize=$2
+p=$3
+ptxt=$4
+opt=$5
 
-batchsize=1000
-numlayers=1
-numnodes=60
-datasize=1000000
-valsize=100000
-steps=1000
-epochs=40
+batchsize=$6
+numlayers=$7
+numnodes=$8
+datasize=$9
+valsize=$10
+steps=$11
+epochs=$12
 
-dt='sq3' #_'$(date '+%Y-%m-%d_%H-%M-%S')
+dt=$13 #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
 	mkdir 'models/'$dt
 fi
@@ -30,21 +30,18 @@ if [ ! -e 'data/'$dataname'.h5' ]; then
 	./gendata $lattype $latsize $datasize $p
 	python csvtohdf5.py $dataname
 fi
-#batchsize=$((datasize/1000))
-for numnodes in 400
-do
-	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
-	$numlayers $batchsize $dataname $valname $dt
 
-	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
-	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
+python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
+$numlayers $batchsize $dataname $valname $dt
 
-	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5' \
-	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5'
+aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
+s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
 
-	aws s3 cp 'results/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv' \
-	s3://nmaskara-models/results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv'
-done
+aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5' \
+s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5'
+
+aws s3 cp 'results/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv' \
+s3://nmaskara-models/results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv'
 
 echo 'done'
 #sudo shutdown -h now

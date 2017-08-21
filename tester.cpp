@@ -71,7 +71,7 @@ void simpletest(string dirname = "", string filename = "") {
 	if (filename == "")	filename = "last";
 	do {
 	ofstream out(dirname + filename + "_info.txt");
-	L.generateErrors(0.05);
+	L.generateErrors(0.1);
 	//L.genCorrPairErrs(0,0.02);
 	L.checkErrors();
 	L.printErrors(out);
@@ -103,6 +103,16 @@ int main(int argc, char** argv) {
 	simpletest();
 	//testnum();
 
+	/*Lattice L(10, 10);
+	int count = 0;
+	int numtrials = 4000;	
+	for (int i = 1; i <= numtrials; i++) {
+		L.clear();
+		L.genCorrPairErrs(0.1, 0);
+		L.checkErrors();
+		L.printErrors();
+		L.printLattice();
+	}*/
 	/*Hexagonal L(16, 16);
 	Decoder D;
 	int count = 0;
