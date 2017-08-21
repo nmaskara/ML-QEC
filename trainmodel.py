@@ -83,47 +83,35 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
-
-if __name__ == "__main__":
-	if (len(sys.argv) != 12):
-		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize dataname valname date"
-		sys.exit()
-
-	# read inputs
-	lattype = sys.argv[1]
-	opttype = sys.argv[2]
-	latsize = int(sys.argv[3])
-	stepsperepoch = int(sys.argv[4])
-	numepochs = int(sys.argv[5])
-	numnodes = int(sys.argv[6])
-	hiddenlayers = int(sys.argv[7])
-	batchsize = int(sys.argv[8])
-	filename = sys.argv[9]
-	valname = sys.argv[10]
-	dirname = sys.argv[11]
+def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
+	hiddenlayers, batchsize, filename, valname, dirname, copy=0):
 
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
-
 	if not os.path.isfile(valfilename):
 		print "Couldn't find validation data"
 		sys.exit(0)
 	if not os.path.isfile(trainfilename):
-		print "Couldn't find training data"
- 	valdata = np.genfromtxt("data/" + valname + ".csv", delimiter=',')
+		print "Couldn't find training data"	
+		sys.exit(0)
+
+	valdata = pd.read_csv(valfilename).values
 	
 	insize = latsize * latsize
-
+	if (copy > 0):
+		cstr = str(copy)
+	else:
+		cstr = ''
 	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + ".hdf5"
+		"_" + str(batchsize) + "_" + opttype + "_" + cstr + ".hdf5"
 	bestmodelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + "_best.hdf5"
+		"_" + str(batchsize) + "_" + opttype + "_" + cstr + "_best.hdf5"
 	resultpath = "results/" + dirname + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + ".csv"
+		"_" + str(batchsize) + "_" + opttype + "_" + cstr + ".csv"
 	bestcheckpt = ModelCheckpoint(bestmodelpath, save_best_only=True)
 	lastcheckpt = ModelCheckpoint(modelpath, save_best_only=False)
 	record = mycallback(resultpath, stepsperepoch)
-	#early_stopping = EarlyStopping(monitor='loss', patience=10)
+
 	if (lattype == "cc"):
 		numcat = 16
 	elif (lattype == "open_square"):
@@ -132,6 +120,14 @@ if __name__ == "__main__":
 		numcat = 2
 	else:
 		numcat = 4
+
+	# If model already exists, load model
+	if os.path.isfile(modelpath):
+		print "Loaded Previous Model"
+		model = load_model(modelpath)
+	else:
+	# otherwise, generate model
+		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
@@ -149,12 +145,49 @@ if __name__ == "__main__":
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 
-	print numcat
 	hist = model.fit_generator(genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch),\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
 		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
 		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+numcat]))
+
+
+if __name__ == "__main__":
+	numparams = 12
+	copies = 0
+	if ('-c' in sys.argv):
+		index = sys.argv.index('-c')
+		copies = int(sys.argv[index+1])
+		del sys.argv[index]
+		del sys.argv[index]
+	if (len(sys.argv) != 12):
+		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize dataname valname date"
+		sys.exit()
+
+	# read inputs
+	lattype = sys.argv[1]
+	opttype = sys.argv[2]
+	latsize = int(sys.argv[3])
+	stepsperepoch = int(sys.argv[4])
+	numepochs = int(sys.argv[5])
+	numnodes = int(sys.argv[6])
+	hiddenlayers = int(sys.argv[7])
+	batchsize = int(sys.argv[8])
+	filename = sys.argv[9]
+	valname = sys.argv[10]
+	dirname = sys.argv[11]
+
+	if (copies > 0):
+		count = 1
+		while count <= copies:
+			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
+				hiddenlayers, batchsize, filename, valname, dirname, copy=count)
+			count += 1
+
+	else:
+		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
+				hiddenlayers, batchsize, filename, valname, dirname)
+
 
 	'''
 	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
