@@ -49,7 +49,7 @@ def make_exist(path):
 def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch):
 	df = pd.read_hdf(filename)
 	numlines = len(df.values)
-	values = df.values
+	values = df.sample(frac=1)
 	count = (initial_epoch * stepsperepoch * batchsize) % numlines
 	while True:
 		dat = np.unpackbits(values[count:count+batchsize], axis=-1)
@@ -57,6 +57,8 @@ def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch
 		count += batchsize
 		if count > numlines:
 			count = 0
+			values = df.sample(frac=1)
+			print "shuffled"
 
 def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	model = Sequential()
@@ -99,15 +101,15 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	
 	insize = latsize * latsize
 	if (copy > 0):
-		cstr = str(copy)
+		cstr = '_' + str(copy)
 	else:
 		cstr = ''
 	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + "_" + cstr + ".hdf5"
+		"_" + str(batchsize) + "_" + opttype + cstr + ".hdf5"
 	bestmodelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + "_" + cstr + "_best.hdf5"
+		"_" + str(batchsize) + "_" + opttype + cstr + "_best.hdf5"
 	resultpath = "results/" + dirname + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
-		"_" + str(batchsize) + "_" + opttype + "_" + cstr + ".csv"
+		"_" + str(batchsize) + "_" + opttype + cstr + ".csv"
 	bestcheckpt = ModelCheckpoint(bestmodelpath, save_best_only=True)
 	lastcheckpt = ModelCheckpoint(modelpath, save_best_only=False)
 	record = mycallback(resultpath, stepsperepoch)

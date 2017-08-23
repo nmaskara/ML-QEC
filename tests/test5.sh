@@ -33,7 +33,7 @@ do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $dataname $valname $dt -c $numcopies
 
-	for n in $(seq 1 1 numcopies)
+	for n in $(seq 1 1 $numcopies)
 	do
 
 		aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_'$n'.hdf5' \
