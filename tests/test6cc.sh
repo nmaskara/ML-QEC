@@ -31,7 +31,7 @@ dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 for numlayers in 7
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
-	$numlayers $batchsize $dataname $valname $dt
+	$numlayers $batchsize $datasize $p $valsize $dt
 
 	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
 	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
