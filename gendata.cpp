@@ -13,13 +13,14 @@
 #include <time.h>
 #include <random>
 
-void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag) {
+void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag, int seed=-1) {
 	int nrows = latsize;
 	int ncols = latsize;
 	ofstream out(fname);
 	Base_Lattice * L;
 	Decoder D;
 	mt19937 mtrand;
+
 	if (type == "square")
 		L = new Lattice(nrows, ncols);
 	if (type == "triangle")
@@ -30,6 +31,11 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L = new Triangle_ColorCode(nrows, ncols);
 	if (type == "surface")
 		L = new Lattice2(nrows, ncols);
+
+	if (seed != -1) {
+		L->setSeed(seed);
+		cout << "seed: " << seed << endl;
+	}
 
 	clock_t start = clock();
 
@@ -92,6 +98,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	}
 	out.close();
 	delete L;
+	cout << "Generated: " << numtrials << endl;
 	cout << "Total Time: " << clock() - start << endl;
 }
 
@@ -101,16 +108,29 @@ int main(int argc, char** argv) {
 		cout << "usage: type latsize numtrials error_rate" << endl;
 		abort();
 	}
-	bool randflag = false;
-	string rf = "-r";
-	if (argc == 6 && !rf.compare(argv[5])) {
-		randflag = true;
-	}
+	int pos = 5;
 	int id = -1;
-	string sid = "-i";
-	if (argc == 7 && !sid.compare(argv[5])) {
-		id = atoi(argv[6]);
+	bool randflag = false;
+	int seed = -1;
+	while (pos < argc) {
+
+		string rf = "-r";
+		string sid = "-i";		
+		string ssid = "-s";
+		if (!rf.compare(argv[pos])) {
+			randflag = true;
+		}
+		else if (!sid.compare(argv[pos])) {
+			assert(pos+1 < argc);
+			id = atoi(argv[pos+1]);
+		}		
+		else if (!ssid.compare(argv[pos])) {
+			assert(pos+1 < argc);
+			seed = atoi(argv[pos+1]);
+		}
+		pos++;
 	}
+
 	string type = argv[1];
 	int latsize = atoi(argv[2]);
 	int numtrials = atoi(argv[3]);
@@ -125,5 +145,6 @@ int main(int argc, char** argv) {
 		filename += "_" + to_string(id);
 	}
 	filename += ".csv";
-	writeTestData(filename, type, latsize, numtrials, error_rate, randflag);
+	cout << id << ", " << seed << endl;
+	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, seed=seed);
 }

@@ -30,7 +30,6 @@ void Base_Lattice::init(int width, int height) {
 	nrows = height;
 	check.resize(width * height);
 	fill(check.begin(), check.end(), 0);
-	mtrand.seed(time(0));
 	nerrs = width * height;
 }
 
@@ -123,6 +122,9 @@ void Base_Lattice::clear() {
 	}
 }
 
+void Base_Lattice::setSeed(int seed) {
+	mtrand.seed(seed);
+}
 /* Applies a matching by connecting all qubits between listed pairs. Qubits in
  * path will be flipped. */
 void Base_Lattice::applyCorrection(pairlist matching) {

@@ -44,31 +44,34 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genset(lattype, latsize, p, setsize, threadid, dataqueue):
+def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads):
 	latsize = str(latsize)
 	p = str(p)
 	ptxt = str(int(float(p)*1000))
 	setsize = str(setsize)
-	threadid = str(threadid)
-	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + threadid + '.csv'
+	threadid = int(threadid)
+	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + '.csv'
 	count = 0
 	while True:
-		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p + ' -i ' + threadid + ' > data.txt')
+		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p +\
+		 ' -i ' + str(threadid) + ' -s ' + str(threadid + numthreads * count) + ' > data.txt')
 		df = pd.read_csv(inname)
 		vals = df.values[:,:-1].astype(bool)
 		dataqueue.put(vals)
+		count += 1
 		#print str(threadid) + '\t' + str(dataqueue.qsize())
 
 def genparallel(lattype, latsize, p, insize, numcat, batchsize):
-	NUMTHREADS=2
+	NUMTHREADS=4
 	dataqueue = Queue(int(100))
 	#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
 	for i in range(NUMTHREADS-1):
-		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue))
+		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1))
 		gendat.start()
 	#rd.start()
 	while True:
 		vals = dataqueue.get()
+		#print (vals[:10,0:insize], vals[:10, insize:insize+numcat])	
 		yield (vals[:,0:insize], vals[:, insize:insize+numcat])	
 
 def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch):
@@ -111,7 +114,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	return model
 
 def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False):
+	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p=0.1):
 
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
@@ -173,9 +176,6 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		initial_epoch = len(toread.readlines())
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
-
-	p=0.1
-	print gendata
 	if (gendata):
 		iterator = genparallel(lattype, latsize, p, insize, numcat, batchsize)
 	else:
@@ -223,17 +223,15 @@ if __name__ == "__main__":
 	filename = lattype + '_' + str(latsize) + '_' + str(datasize) + '_' + str(int(p*1000)) 
 	valname = lattype + '_' + str(latsize) + '_' + str(valsize) + '_' + str(int(p*1000))
 
-	print gendata
-
 	if (copies > 0):
 		count = 1
 		while count <= copies:
 			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata)
+				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p=p)
 			count += 1
 	else:
 		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata)
+				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p=p)
 
 
 	'''
