@@ -10,6 +10,7 @@ import os
 import errno
 import pandas as pd
 import random
+from multiprocessing import Pool, Queue, Process
 
 class mycallback(Callback):
 
@@ -36,15 +37,39 @@ class mycallback(Callback):
 		self.outfile.write(str(logs['val_acc']) + ',')
 		self.outfile.write('\n')
 
-
-
-
 def make_exist(path):
 	try:
 		os.makedirs(path)
 	except OSError as exception:
 		if exception.errno != errno.EEXIST:
 			raise
+
+def genset(lattype, latsize, p, setsize, threadid, dataqueue):
+	latsize = str(latsize)
+	p = str(p)
+	ptxt = str(int(float(p)*1000))
+	setsize = str(setsize)
+	threadid = str(threadid)
+	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + threadid + '.csv'
+	count = 0
+	while True:
+		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p + ' -i ' + threadid + ' > data.txt')
+		df = pd.read_csv(inname)
+		vals = df.values[:,:-1].astype(bool)
+		dataqueue.put(vals)
+		#print str(threadid) + '\t' + str(dataqueue.qsize())
+
+def genparallel(lattype, latsize, p, insize, numcat, batchsize):
+	NUMTHREADS=2
+	dataqueue = Queue(int(100))
+	#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
+	for i in range(NUMTHREADS-1):
+		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue))
+		gendat.start()
+	#rd.start()
+	while True:
+		vals = dataqueue.get()
+		yield (vals[:,0:insize], vals[:, insize:insize+numcat])	
 
 def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch):
 	df = pd.read_hdf(filename)
@@ -86,16 +111,18 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	return model
 
 def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-	hiddenlayers, batchsize, filename, valname, dirname, copy=0):
+	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False):
 
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
+
 	if not os.path.isfile(valfilename):
 		print "Couldn't find validation data"
 		sys.exit(0)
-	if not os.path.isfile(trainfilename):
-		print "Couldn't find training data"	
-		sys.exit(0)
+	if (not gendata):
+		if not os.path.isfile(trainfilename):
+			print "Couldn't find training data"	
+			sys.exit(0)
 
 	valdata = pd.read_csv(valfilename).values
 	
@@ -147,7 +174,17 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 
-	hist = model.fit_generator(genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch),\
+	p=0.1
+	print gendata
+	if (gendata):
+		iterator = genparallel(lattype, latsize, p, insize, numcat, batchsize)
+	else:
+		iterator = genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch)
+		
+	print iterator
+
+	hist = model.fit_generator( \
+		iterator,\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
 		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
@@ -162,8 +199,8 @@ if __name__ == "__main__":
 		copies = int(sys.argv[index+1])
 		del sys.argv[index]
 		del sys.argv[index]
-	if (len(sys.argv) != 12):
-		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize dataname valname date"
+	if (len(sys.argv) != 13):
+		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize datasize p valsize date"
 		sys.exit()
 
 	# read inputs
@@ -175,20 +212,28 @@ if __name__ == "__main__":
 	numnodes = int(sys.argv[6])
 	hiddenlayers = int(sys.argv[7])
 	batchsize = int(sys.argv[8])
-	filename = sys.argv[9]
-	valname = sys.argv[10]
-	dirname = sys.argv[11]
+	datasize = int(sys.argv[9])
+	p = float(sys.argv[10])
+	valsize = int(sys.argv[11])
+	dirname = sys.argv[12]
+
+	gendata = False
+	if (datasize == -1):
+		gendata = True
+	filename = lattype + '_' + str(latsize) + '_' + str(datasize) + '_' + str(int(p*1000)) 
+	valname = lattype + '_' + str(latsize) + '_' + str(valsize) + '_' + str(int(p*1000))
+
+	print gendata
 
 	if (copies > 0):
 		count = 1
 		while count <= copies:
 			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, copy=count)
+				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata)
 			count += 1
-
 	else:
 		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname)
+				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata)
 
 
 	'''

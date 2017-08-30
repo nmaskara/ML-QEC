@@ -106,14 +106,23 @@ int main(int argc, char** argv) {
 	if (argc == 6 && !rf.compare(argv[5])) {
 		randflag = true;
 	}
+	int id = -1;
+	string sid = "-i";
+	if (argc == 7 && !sid.compare(argv[5])) {
+		id = atoi(argv[6]);
+	}
 	string type = argv[1];
 	int latsize = atoi(argv[2]);
 	int numtrials = atoi(argv[3]);
 	float error_rate = atof(argv[4]);
+
 	string filename = "data/" + type + "_" + to_string(latsize) + "_" + to_string(numtrials) + 
 		"_" + to_string(int(error_rate * 1000));
 	if (randflag) {
 		filename += "_random";
+	}
+	if (id != -1) {
+		filename += "_" + to_string(id);
 	}
 	filename += ".csv";
 	writeTestData(filename, type, latsize, numtrials, error_rate, randflag);
