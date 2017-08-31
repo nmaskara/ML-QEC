@@ -44,14 +44,14 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads):
+def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads, countstart):
 	latsize = str(latsize)
 	p = str(p)
 	ptxt = str(int(float(p)*1000))
 	setsize = str(setsize)
 	threadid = int(threadid)
 	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + '.csv'
-	count = 0
+	count = countstart
 	while True:
 		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p +\
 		 ' -i ' + str(threadid) + ' -s ' + str(threadid + numthreads * count) + ' > data.txt')
@@ -61,12 +61,13 @@ def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads):
 		count += 1
 		#print str(threadid) + '\t' + str(dataqueue.qsize())
 
-def genparallel(lattype, latsize, p, insize, numcat, batchsize):
+def genparallel(lattype, latsize, p, insize, numcat, batchsize, initial_epoch, stepsperepoch):
 	NUMTHREADS=4
 	dataqueue = Queue(int(100))
 	#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
+	countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
 	for i in range(NUMTHREADS-1):
-		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1))
+		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1, countstart))
 		gendat.start()
 	#rd.start()
 	while True:
@@ -177,7 +178,7 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
 	if (gendata):
-		iterator = genparallel(lattype, latsize, p, insize, numcat, batchsize)
+		iterator = genparallel(lattype, latsize, p, insize, numcat, batchsize, initial_epoch, stepsperepoch)
 	else:
 		iterator = genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch)
 		
