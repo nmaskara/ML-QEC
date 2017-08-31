@@ -27,6 +27,7 @@ class mycallback(Callback):
 			self.outfile = open(filename, 'w')		
 
 	def on_train_end(self, logs=None):
+		print "file closed"
 		self.outfile.close()
 		
 	def on_epoch_end(self, epoch, logs=None):
@@ -61,19 +62,13 @@ def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads, counts
 		count += 1
 		#print str(threadid) + '\t' + str(dataqueue.qsize())
 
-def genparallel(lattype, latsize, p, insize, numcat, batchsize, initial_epoch, stepsperepoch):
-	NUMTHREADS=4
-	dataqueue = Queue(int(100))
-	#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
-	countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
-	for i in range(NUMTHREADS-1):
-		gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1, countstart))
-		gendat.start()
-	#rd.start()
+def genparallel(insize, numcat, dataqueue):
 	while True:
 		vals = dataqueue.get()
 		#print (vals[:10,0:insize], vals[:10, insize:insize+numcat])	
 		yield (vals[:,0:insize], vals[:, insize:insize+numcat])	
+
+
 
 def genbatches(filename, insize, numcat, batchsize, initial_epoch, stepsperepoch):
 	df = pd.read_hdf(filename)
@@ -177,8 +172,19 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		initial_epoch = len(toread.readlines())
 		toread.close()
 		print "Initial Epoch: " + str(initial_epoch)
+	
+	processes = []
 	if (gendata):
-		iterator = genparallel(lattype, latsize, p, insize, numcat, batchsize, initial_epoch, stepsperepoch)
+		NUMTHREADS=4
+		dataqueue = Queue(int(100))
+		#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
+		countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
+		for i in range(NUMTHREADS-1):
+			gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1, countstart))
+			gendat.start()
+			processes.append(gendat)
+
+		iterator = genparallel(insize, numcat, dataqueue)
 	else:
 		iterator = genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch)
 		
@@ -190,6 +196,11 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		epochs=numepochs, initial_epoch=initial_epoch, \
 		callbacks=[bestcheckpt, lastcheckpt, record], verbose=1, \
 		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+numcat]))
+	print hist
+	for p in processes:
+		p.terminate()
+		p.join()
+
 
 
 if __name__ == "__main__":
