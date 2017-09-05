@@ -1,7 +1,7 @@
 OBJS = Lattice.o decoder.o Base_Lattice.o Triangle.o Hexagonal.o Triangle_ColorCode.o Lattice2.o Triangle_ColorCode2.o
 CC = g++
 DEBUG = -g
-CFLAGS = -std=c++11 -Wall -c $(DEBUG)
+CFLAGS = -std=c++11 -Wall -c -O2 $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
 
 all: $(OBJS) tester.o runtest.o gendata.o genopendata.o
