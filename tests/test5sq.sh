@@ -1,20 +1,20 @@
 #!/bin/bash -x
 
-lattype='square'
-latsize=5
+lattype='cc2'
+latsize=3
 p=0.1
 ptxt=100
 opt='adam'
 
 batchsize=1000
 numlayers=3
-numnodes=300
+numnodes=100
 datasize=1000000
 valsize=100000
-steps=200
-epochs=14
+steps=1000
+epochs=50
 
-dt='sq5' #_'$(date '+%Y-%m-%d_%H-%M-%S')
+dt='cc2_3' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
 	mkdir 'models/'$dt
 fi
@@ -28,7 +28,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
-for numlayers in 2
+for numlayers in 1
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt

@@ -31,6 +31,7 @@ void Base_Lattice::init(int width, int height) {
 	check.resize(width * height);
 	fill(check.begin(), check.end(), 0);
 	nerrs = width * height;
+	setSeed(time(0));
 }
 
 void Base_Lattice::printErrors(ostream& out) {

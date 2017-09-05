@@ -3,6 +3,7 @@
 #include "Lattice2.hpp"
 #include "Triangle.hpp"
 #include "Triangle_ColorCode.hpp"
+#include "Triangle_ColorCode2.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
 #include <assert.h>
@@ -29,6 +30,8 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L = new Hexagonal(nrows, ncols);
 	if (type == "cc")
 		L = new Triangle_ColorCode(nrows, ncols);
+	if (type == "cc2")
+		L = new Triangle_ColorCode2(nrows, ncols);
 	if (type == "surface")
 		L = new Lattice2(nrows, ncols);
 
@@ -49,7 +52,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
 		pairlist matching;
-		if (type != "cc")
+		if (type != "cc" && type != "cc2")
 			matching = D.matchTopLeft(L->getErrors());
 		int result;
 		if (type == "surface") {
@@ -81,7 +84,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		int numcat;
 		if (type == "cc")
 			numcat = 16;
-		else if (type == "surface")
+		else if (type == "surface" || type == "cc2")
 			numcat = 2;
 		else
 			numcat = 4;

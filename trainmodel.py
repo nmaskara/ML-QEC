@@ -126,6 +126,9 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	valdata = pd.read_csv(valfilename).values
 	
 	insize = latsize * latsize
+	if (lattype == "cc2"):
+		nrows = latsize/2
+		insize = 3 * nrows * (nrows+1) / 2
 	if (copy > 0):
 		cstr = '_' + str(copy)
 	else:
@@ -145,6 +148,8 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	elif (lattype == "open_square"):
 		numcat = 16
 	elif (lattype == "surface"):
+		numcat = 2
+	elif (lattype == "cc2"):
 		numcat = 2
 	else:
 		numcat = 4

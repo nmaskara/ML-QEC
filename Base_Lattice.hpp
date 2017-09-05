@@ -31,11 +31,11 @@ public:
 
 	mt19937 mtrand;
 	// Helper functions
-	int rctoi(int row, int col);
+	virtual int rctoi(int row, int col);
 
-	int itor(int i);
+	virtual int itor(int i);
 
-	int itoc(int i);
+	virtual int itoc(int i);
 
 	// Returns an array of locations of errors in check matrix
 	vector<int> getErrors();
