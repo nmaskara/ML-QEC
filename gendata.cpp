@@ -35,10 +35,10 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 	if (type == "surface")
 		L = new Lattice2(nrows, ncols);
 
-	if (seed != -1) {
+	/*if (seed != -1) {
 		L->setSeed(seed);
 		cout << "seed: " << seed << endl;
-	}
+	}*/
 
 	clock_t start = clock();
 

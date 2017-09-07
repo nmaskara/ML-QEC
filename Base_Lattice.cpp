@@ -1,5 +1,15 @@
 #include "Base_Lattice.hpp"
 
+mt19937 RandomlySeededMersenneTwister () {
+    // Magic number 624: The number of unsigned ints the MT uses as state
+    vector<unsigned int> random_data(624);
+    random_device source;
+    generate(begin(random_data), end(random_data), [&](){return source();});
+    seed_seq seeds(begin(random_data), end(random_data));
+    mt19937 seededEngine (seeds);
+    return seededEngine;
+}
+
 int Base_Lattice::rctoi(int row, int col) {
 	if (row >= nrows || col >= ncols) {
 		cout << "rctoi: Row Column out of bounds" << endl;
@@ -31,7 +41,7 @@ void Base_Lattice::init(int width, int height) {
 	check.resize(width * height);
 	fill(check.begin(), check.end(), 0);
 	nerrs = width * height;
-	setSeed(time(0));
+	mtrand = RandomlySeededMersenneTwister();
 }
 
 void Base_Lattice::printErrors(ostream& out) {

@@ -2,8 +2,8 @@
 
 lattype='square'
 latsize=3
-p=0.1
-ptxt=100
+p=0.01
+ptxt=10
 pratio=1
 opt='adam'
 
@@ -22,7 +22,7 @@ fi
 if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
-#./gendata $lattype $latsize $valsize $p -c $pratio
+./gendata $lattype $latsize $valsize $p -c $pratio
 valname=$lattype'_'$latsize'_'$valsize'_'$ptxt'_corr_'$pratio
 
 #./gendata $lattype $latsize $datasize $p -c $pratio
