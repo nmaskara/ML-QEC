@@ -23,10 +23,10 @@ if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
 #./gendata $lattype $latsize $valsize $p -c $pratio
-valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
+valname=$lattype'_'$latsize'_'$valsize'_'$ptxt'_corr_'$pratio
 
 #./gendata $lattype $latsize $datasize $p -c $pratio
-dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
+dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_corr_'$pratio
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
 for numlayers in 1
@@ -34,14 +34,14 @@ do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt -c $pratio
 
-	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'.hdf5' \
-	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'.hdf5'
+	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
+	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
 
-	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'_best.hdf5' \
-	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'_best.hdf5'
+	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5' \
+	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_best.hdf5'
 
-	aws s3 cp 'results/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'.csv' \
-	s3://nmaskara-models/results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'_corr_'$pratio'.csv'
+	aws s3 cp 'results/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv' \
+	s3://nmaskara-models/results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv'
 done
 
 echo 'done'
