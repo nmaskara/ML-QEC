@@ -45,7 +45,7 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads, countstart):
+def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads, countstart):
 	latsize = str(latsize)
 	p = str(p)
 	ptxt = str(int(float(p)*1000))
@@ -53,9 +53,12 @@ def genset(lattype, latsize, p, setsize, threadid, dataqueue, numthreads, counts
 	threadid = int(threadid)
 	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + '.csv'
 	count = countstart
+	flags = ' -s ' + str(threadid + numthreads * count)
+	if pratio > 0:
+		flags += ' -c ' + str(pratio)
 	while True:
 		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p +\
-		 ' -i ' + str(threadid) + ' -s ' + str(threadid + numthreads * count) + ' > data.txt')
+		 ' -i ' + str(threadid) + flags + ' > data.txt')
 		df = pd.read_csv(inname)
 		vals = df.values[:,:-1].astype(bool)
 		dataqueue.put(vals)
@@ -116,11 +119,11 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	valfilename = "data/" + valname + ".csv"
 
 	if not os.path.isfile(valfilename):
-		print "Couldn't find validation data"
+		print "Couldn't find validation data at : " + valfilename
 		sys.exit(0)
 	if (not gendata):
 		if not os.path.isfile(trainfilename):
-			print "Couldn't find training data"	
+			print "Couldn't find training data at : " + trainfilename	
 			sys.exit(0)
 
 	valdata = pd.read_csv(valfilename).values
@@ -136,8 +139,6 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		insize = 3 * nrows * (nrows+1) / 2
 	if (copy > 0):
 		cstr = '_' + str(copy)
-	if (p0[1] != 0):
-		cstr = '_' + str(p0[1])
 
 	else:
 		cstr = ''
@@ -193,7 +194,7 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
 		countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
 		for i in range(NUMTHREADS-1):
-			gendat = Process(target=genset, args=(lattype, latsize, p, batchsize, i, dataqueue, NUMTHREADS-1, countstart))
+			gendat = Process(target=genset, args=(lattype, latsize, p, pratio, batchsize, i, dataqueue, NUMTHREADS-1, countstart))
 			gendat.start()
 			processes.append(gendat)
 
@@ -255,8 +256,8 @@ if __name__ == "__main__":
 	valname = lattype + '_' + str(latsize) + '_' + str(valsize) + '_' + str(int(p*1000))
 
 	if (pratio > 0):
-		filename += '_' + str(pratio)
-		valname += '_' + str(pratio)
+		filename += '_corr_' + str(pratio)
+		valname += '_corr_' + str(pratio)
 
 	if (copies > 0):
 		count = 1
