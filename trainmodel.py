@@ -51,7 +51,10 @@ def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads
 	ptxt = str(int(float(p)*1000))
 	setsize = str(setsize)
 	threadid = int(threadid)
-	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + '.csv'
+	tail = ''
+	if pratio > 0:
+		tail += '_corr_' + str(pratio)
+	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + tail + '.csv'
 	count = countstart
 	flags = ' -s ' + str(threadid + numthreads * count)
 	if pratio > 0:
