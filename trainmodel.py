@@ -110,7 +110,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	return model
 
 def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p=0.1):
+	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p0=(0.1, 0)):
 
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
@@ -125,12 +125,20 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 
 	valdata = pd.read_csv(valfilename).values
 	
+	p = p0[0]
+	p2 = 0
+	if (p0[1] != 0):
+		p2 = p / p0[1]
+
 	insize = latsize * latsize
 	if (lattype == "cc2"):
 		nrows = latsize/2
 		insize = 3 * nrows * (nrows+1) / 2
 	if (copy > 0):
 		cstr = '_' + str(copy)
+	if (p0[1] != 0):
+		cstr = '_' + str(p0[1])
+
 	else:
 		cstr = ''
 	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
@@ -211,9 +219,15 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 if __name__ == "__main__":
 	numparams = 12
 	copies = 0
+	pratio = 0
+	if ('-copy' in sys.argv):
+		index = sys.argv.index('-copy')
+		copies = int(sys.argv[index+1])
+		del sys.argv[index]
+		del sys.argv[index]
 	if ('-c' in sys.argv):
 		index = sys.argv.index('-c')
-		copies = int(sys.argv[index+1])
+		pratio = int(sys.argv[index+1])
 		del sys.argv[index]
 		del sys.argv[index]
 	if (len(sys.argv) != 13):
@@ -244,11 +258,11 @@ if __name__ == "__main__":
 		count = 1
 		while count <= copies:
 			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p=p)
+				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p0=(p, pratio))
 			count += 1
 	else:
 		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p=p)
+				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p0=(p, pratio))
 
 
 	'''

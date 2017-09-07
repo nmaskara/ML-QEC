@@ -14,7 +14,7 @@
 #include <time.h>
 #include <random>
 
-void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag, int seed=-1) {
+void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag, int seed=-1, float p2=0) {
 	int nrows = latsize;
 	int ncols = latsize;
 	ofstream out(fname);
@@ -48,7 +48,10 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		else if (randflag) p = (double) prate * mtrand() / mtrand.max();
 		else p = prate;
 		L->clear();
-		L->generateErrors(p);
+		if (p2 == 0)
+			L->generateErrors(p);
+		else
+			L->genCorrPairErrs(p, p2);
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
 		pairlist matching;
@@ -115,11 +118,13 @@ int main(int argc, char** argv) {
 	int id = -1;
 	bool randflag = false;
 	int seed = -1;
+	int pratio = 0;
 	while (pos < argc) {
 
 		string rf = "-r";
 		string sid = "-i";		
 		string ssid = "-s";
+		string corr = "-c";
 		if (!rf.compare(argv[pos])) {
 			randflag = true;
 		}
@@ -131,6 +136,10 @@ int main(int argc, char** argv) {
 			assert(pos+1 < argc);
 			seed = atoi(argv[pos+1]);
 		}
+		else if (!corr.compare(argv[pos])) {
+			assert(pos+1 < argc);
+			pratio = atoi(argv[pos+1]);
+		}
 		pos++;
 	}
 
@@ -138,6 +147,9 @@ int main(int argc, char** argv) {
 	int latsize = atoi(argv[2]);
 	int numtrials = atoi(argv[3]);
 	float error_rate = atof(argv[4]);
+	float p2 = 0;
+	if (pratio != 0)
+		p2 = error_rate / pratio;
 
 	string filename = "data/" + type + "_" + to_string(latsize) + "_" + to_string(numtrials) + 
 		"_" + to_string(int(error_rate * 1000));
@@ -147,7 +159,10 @@ int main(int argc, char** argv) {
 	if (id != -1) {
 		filename += "_" + to_string(id);
 	}
+	if (pratio != 0) {
+		filename += "_corr_" + to_string(pratio);
+	}
 	filename += ".csv";
 	cout << id << ", " << seed << endl;
-	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, seed=seed);
+	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, seed=seed, p2=p2);
 }

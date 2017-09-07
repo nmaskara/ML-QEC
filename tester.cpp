@@ -64,8 +64,8 @@ void testnum() {
 
 
 void simpletest(string dirname = "", string filename = "") {
-	int nrows = 19;
-	int ncols = 19;
+	int nrows = 11;
+	int ncols = 11;
 	Triangle_ColorCode2 L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";

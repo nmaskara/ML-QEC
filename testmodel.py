@@ -5,10 +5,11 @@ import pandas as pd
 
 
 latsize = 9
-numcats = 16
+numcats = 2
 data = []
-f = 'cc_9_100000_'
-lsiz = latsize * latsize
+f = 'cc2_9_100000_'
+#lsiz = latsize * latsize
+lsiz = 30
 
 fil = sys.argv[1]
 outfile = open(sys.argv[2], 'a')
@@ -21,6 +22,3 @@ for p in np.linspace(0.02, 0.2, 10):
 	print loss, 1-acc
 	outfile.write(fil + ', ' + str(p) + ', ' + str(loss) + ', ' + str(1-acc) + '\n')
 outfile.close()
-
-
-

@@ -19,6 +19,8 @@ typedef vector<int> mmap;	// Maps a list of measurement bits to a list of qubits
 typedef vector<qubit> qarray;	//List of all qubits.
 typedef vector< pair<int, int> > pairlist;
 
+// Base class, not meant to be instantiated.
+// 
 class Base_Lattice {
 
 public:
