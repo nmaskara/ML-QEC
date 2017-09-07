@@ -258,6 +258,10 @@ if __name__ == "__main__":
 	filename = lattype + '_' + str(latsize) + '_' + str(datasize) + '_' + str(int(p*1000)) 
 	valname = lattype + '_' + str(latsize) + '_' + str(valsize) + '_' + str(int(p*1000))
 
+	if (pratio > 0):
+		filename += '_corr_' + str(pratio)
+		valname += '_corr_' + str(pratio)
+
 	if (copies > 0):
 		count = 1
 		while count <= copies:
