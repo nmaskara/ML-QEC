@@ -21,6 +21,9 @@ if len(sys.argv) > 5:
 	if sys.argv[5] == '-c':
 		cstr = '_corr_' + sys.argv[6]
 
+if (datasize < incsize):
+	incsize = datasize
+	
 inname = 'data/' + sys.argv[1] + '_' + sys.argv[2] + '_' + str(incsize) + '_' + ptxt + cstr + '.csv'
 outname = 'data/'+ sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_' + ptxt + cstr + '.h5'
 
@@ -29,13 +32,14 @@ if os.path.exists(outname):
 
 added = 0
 chsize = 100000
-if (datasize < incsize):
-	incsize = datasize
+
 while (added < datasize):
 	cmd = './gendata ' + sys.argv[1] + ' ' + sys.argv[2] + ' ' + str(incsize) + ' ' + sys.argv[4]
 	count = 5
 	while count < len(sys.argv):
 		cmd += ' ' + sys.argv[count]
+		count += 1
+	print cmd
 	os.system(cmd)
 
 	for df in pd.read_csv(inname, chunksize=chsize):
