@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 lattype='cc2'
-latsize=7
+latsize=11
 p=0.1
 ptxt=100
 opt='adam'
@@ -14,14 +14,14 @@ valsize=100000
 steps=1000
 epochs=50
 
-dt='cc2_7' #_'$(date '+%Y-%m-%d_%H-%M-%S')
+dt='cc2_11' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
 	mkdir 'models/'$dt
 fi
 if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
-./gendata $lattype $latsize $valsize $p
+#./gendata $lattype $latsize $valsize $p
 valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 
 #./gendata $lattype $latsize $datasize $p

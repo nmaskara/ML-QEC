@@ -42,7 +42,11 @@ rem5c = getRem(model5c, indat, outdat)'''
 datsz = str(100000)
 direc = sys.argv[1]
 outfile = open(sys.argv[2], 'w')
+start = float(sys.argv[3])
+end = float(sys.argv[4])
+samples = int(sys.argv[5])
 for fil in os.listdir(direc):
+	print fil
 	args = fil.split('_')
 	model = load_model(direc +'/' + fil)
 	dist = int(args[1])
@@ -61,8 +65,15 @@ for fil in os.listdir(direc):
 	else:
 		print "UNKOWN TYPE : " + args[0]
 		sys.exit()
-	for p in np.linspace(0.02, 0.2, 10):
+	for p in np.linspace(start, end, samples):
+		print p
 		ptxt = str(int(p*1000))
+		cmd = ' '.join(['./gendata', args[0], args[1], datsz, str(p)])
+		if len(args) == 10:
+			ptxt += '_corr_' + str(args[5])
+			cmd += ' -c ' + str(args[5])
+		print cmd
+		os.system(cmd)
 		dat = pd.read_csv('data/' + '_'.join([args[0], args[1], datsz, ptxt]) + '.csv').values
 		print "loaded data: " + '_'.join([args[0], args[1], datsz, ptxt])
 
