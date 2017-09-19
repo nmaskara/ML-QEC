@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os, sys
 
-if len(sys.argv) < 6:
+if len(sys.argv) < 5:
 	print "usage: python gendata.py type latsize datasize p"
 	sys.exit(0)
 

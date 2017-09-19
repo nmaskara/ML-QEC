@@ -1,17 +1,17 @@
 #!/bin/bash -x
 
 lattype='cc2'
-latsize=11
+latsize=9
 p=0.1
 ptxt=100
 opt='adam'
 
 batchsize=10000
 numlayers=3
-numnodes=200
+numnodes=500
 datasize=-1
-valsize=100000
-steps=1000
+valsize=1000
+steps=1
 epochs=50
 
 dt='cc2_11' #_'$(date '+%Y-%m-%d_%H-%M-%S')
@@ -21,14 +21,14 @@ fi
 if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
-#./gendata $lattype $latsize $valsize $p
+./gendata $lattype $latsize $valsize $p
 valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 
 #./gendata $lattype $latsize $datasize $p
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
-for numlayers in 1
+for numlayers in 5
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt
