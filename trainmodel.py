@@ -219,7 +219,7 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		p.join()
 
 
-
+# execute
 if __name__ == "__main__":
 	numparams = 12
 	copies = 0
