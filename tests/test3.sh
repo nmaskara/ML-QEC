@@ -8,7 +8,7 @@ pratio=1
 opt='adam'
 
 batchsize=1000
-numlayers=3
+numlayers=1
 numnodes=100
 datasize=-1
 valsize=100000

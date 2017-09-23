@@ -42,9 +42,11 @@ rem5c = getRem(model5c, indat, outdat)'''
 datsz = str(100000)
 direc = sys.argv[1]
 outfile = open(sys.argv[2], 'w')
-start = float(sys.argv[3])
-end = float(sys.argv[4])
-samples = int(sys.argv[5])
+
+#start = float(sys.argv[3])
+#end = float(sys.argv[4])
+#samples = int(sys.argv[5])
+
 for fil in os.listdir(direc):
 	print fil
 	args = fil.split('_')
@@ -65,15 +67,21 @@ for fil in os.listdir(direc):
 	else:
 		print "UNKOWN TYPE : " + args[0]
 		sys.exit()
-	for p in np.linspace(start, end, samples):
+	for ptxt in np.arange(10, 200, 10):
+	#for p in [0.001, 0.01, 0.1]:
+		p = float(ptxt) / 1000
 		print p
-		ptxt = str(int(p*1000))
+		ptxt = str(ptxt)
+
 		cmd = ' '.join(['./gendata', args[0], args[1], datsz, str(p)])
-		if len(args) == 10:
-			ptxt += '_corr_' + str(args[5])
-			cmd += ' -c ' + str(args[5])
-		print cmd
-		os.system(cmd)
+		#if len(args) == 10:
+		#	ptxt += '_corr_' + str(args[5])
+		#	cmd += ' -c ' + str(args[5])
+		filename = 'data/' + '_'.join([args[0], args[1], datsz, ptxt]) + '.csv'
+		if not os.path.exists(filename):
+			print cmd
+			os.system(cmd)
+
 		dat = pd.read_csv('data/' + '_'.join([args[0], args[1], datsz, ptxt]) + '.csv').values
 		print "loaded data: " + '_'.join([args[0], args[1], datsz, ptxt])
 

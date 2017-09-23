@@ -101,6 +101,8 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 			model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
 		model.add(Activation('relu'))
+		#act = advanced_activations.PReLU()
+		#model.add(act)
 		if (first):
 			first = False
 	layer3 = Dense(units=numcat, activation='softmax')

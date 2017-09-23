@@ -5,11 +5,12 @@ import pandas as pd
 
 
 latsize = 9
-numcats = 2
+numcats = 4
 data = []
-f = 'cc2_9_100000_'
-#lsiz = latsize * latsize
-lsiz = 30
+#f = 'cc2_11_100000_'
+f = 'square_9_100000_'
+lsiz = latsize * latsize
+#lsiz = 3 * (latsize/2) * (latsize/2 + 1) / 2
 
 fil = sys.argv[1]
 outfile = open(sys.argv[2], 'a')
