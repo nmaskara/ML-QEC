@@ -2,8 +2,8 @@
 
 lattype='cc2'
 latsize=7
-p=0.027
-ptxt=27
+p=0.030
+ptxt=30
 pratio=1
 opt='adam'
 
