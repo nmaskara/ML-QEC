@@ -8,76 +8,77 @@ void Lattice::genCorrPairErrs(double p1, double p2) {
 	int ncorr = 3;
 	int nX = nrows * ncols;
 	for (int i = 0; i < (int) data.size(); i++){
+		// weight 1 error
 		double randval = (double) mtrand() / mtrand.max();
 		if (randval < p1){
 			data[i].err = !data[i].err;
 		}
-		else {
-			vector<int> adj;
-			// generate ncorr random variables
-			vector<int> rands(ncorr);
-			for (uint k = 0; k < rands.size(); k++) {
-				if ((double) mtrand() / mtrand.max() < p2) {
-					rands[k] = 1;
-				}
-				else{
-					rands[k] = 0;
-				}
+		// weight 2 errors
+		vector<int> adj;
+		// generate ncorr random variables
+		vector<int> rands(ncorr);
+		for (uint k = 0; k < rands.size(); k++) {
+			if ((double) mtrand() / mtrand.max() < p2) {
+				rands[k] = 1;
 			}
-			if (i < nX) {
-				int r = itor(i);
-				int c = itoc(i);
-				// get adjacent indexes
-				
-				// above left
-				//i0 = nX + rctoi((nrows + r - 1) % nrows, (ncols + c - 1) % ncols);
-				// above vertical
-				//i1 = rctoi((nrows + r - 1) % nrows, c);
-				// above right
-				//i2 = nX + rctoi((nrows + r - 1) % nrows, c);
-				// below left
-				//i3 = 
-				adj.push_back(nX + rctoi(r, (ncols + c - 1) % ncols));
-				// below vertical
-				//i4 = 
-				adj.push_back(rctoi((r+1) % nrows, c));
-				// below right
-				//i5 = 
-				adj.push_back(nX + rctoi(r, c));
-
+			else{
+				rands[k] = 0;
 			}
-			else {
-				int r = itor(i - nX);
-				int c = itoc(i - nX);
-				//right above
-				//i0 = rctoi(r, (c + 1) % ncols);
-				// right horizontal
-				//i1 = 
-				adj.push_back(nX + rctoi(r, (c + 1) % ncols));
-				// right below
-				//i2 = 
-				adj.push_back(rctoi((r + 1) % nrows, (c + 1) % ncols));
-				// left above
-				//i3 = rctoi(r, c);
-				// left horizontal
-				//i4 = nX + rctoi(r, (ncols + c - 1) % ncols);
-				// left below
-				//i5 = 
-				adj.push_back(rctoi((r + 1) % nrows, c));
-			}
-			//cout << rands << endl;
-			// flip each pair independently
-			for (uint k = 0; k < adj.size(); k++) {
-				if (rands[k])	{
-					data[i].err = !data[i].err;	
-					data[adj[k]].err = !data[adj[k]].err;				
-				}
-				else {
-					//cout << "skip" << endl;
-				}
-			}
+		}
+		if (i < nX) {
+			int r = itor(i);
+			int c = itoc(i);
+			// get adjacent indexes
+			
+			// above left
+			//i0 = nX + rctoi((nrows + r - 1) % nrows, (ncols + c - 1) % ncols);
+			// above vertical
+			//i1 = rctoi((nrows + r - 1) % nrows, c);
+			// above right
+			//i2 = nX + rctoi((nrows + r - 1) % nrows, c);
+			// below left
+			//i3 = 
+			adj.push_back(nX + rctoi(r, (ncols + c - 1) % ncols));
+			// below vertical
+			//i4 = 
+			adj.push_back(rctoi((r+1) % nrows, c));
+			// below right
+			//i5 = 
+			adj.push_back(nX + rctoi(r, c));
 
 		}
+		else {
+			int r = itor(i - nX);
+			int c = itoc(i - nX);
+			//right above
+			//i0 = rctoi(r, (c + 1) % ncols);
+			// right horizontal
+			//i1 = 
+			adj.push_back(nX + rctoi(r, (c + 1) % ncols));
+			// right below
+			//i2 = 
+			adj.push_back(rctoi((r + 1) % nrows, (c + 1) % ncols));
+			// left above
+			//i3 = rctoi(r, c);
+			// left horizontal
+			//i4 = nX + rctoi(r, (ncols + c - 1) % ncols);
+			// left below
+			//i5 = 
+			adj.push_back(rctoi((r + 1) % nrows, c));
+		}
+		//cout << rands << endl;
+		// flip each pair independently
+		for (uint k = 0; k < adj.size(); k++) {
+			if (rands[k])	{
+				data[i].err = !data[i].err;	
+				data[adj[k]].err = !data[adj[k]].err;				
+			}
+			else {
+				//cout << "skip" << endl;
+			}
+		}
+
+		
 	}
 }
 

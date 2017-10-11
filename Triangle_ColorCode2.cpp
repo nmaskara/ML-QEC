@@ -12,8 +12,9 @@ int rowmax(int row) {
 }
 
 int latsize(int d) {
-	if (d < 0)
+	if (d <= 0)
 		return 0;
+	assert(d % 2 == 1);
 	return (3*d*d + 1) / 4;
 }
 
@@ -33,36 +34,54 @@ int Triangle_ColorCode2::rctoi(int row, int col) {
 	return ct + col;
 }
 
+int invlatsize(int i) {
+	double dd = (4*i - 1) / 3;
+	int d =(int) sqrt(dd);
+	if (d % 2 == 0) 
+		return d-1; 
+	return d;
+}
+
 int Triangle_ColorCode2::itor(int i) {
-	int d = sqrt( ( 4*i - 1 ) / 3 );
+	i = i + 1;
+	int d = invlatsize(i);
 	int rem = i - latsize(d);
 	int r0 = 3 * ( (d-1) / 2);
 	int r;
-	if (rem > 3 * (d-1) / 2) {
+	//cout << i << ", " << d << ", " << r0 << ", " << rem << endl;
+	if (rem > 2*d + 1) {
 		r = r0 + 3;
 	}	
 	else if (rem > d) {
 		r = r0 + 2;
 	}
-	else {
+	else if (rem > 0) {
 		r = r0 + 1;
+	}
+	else {
+		r = r0;
 	}
 	return r;
 }
 
 int Triangle_ColorCode2::itoc(int i) {
-	int d = sqrt( ( 4*i - 1 ) / 3 );
+	i = i + 1;
+	int d = invlatsize(i);
 	int rem = i - latsize(d);
 	int c;
-	if (rem > 3 * (d-1) / 2) {
-		c = rem - 2*d + 1;
+	if (rem > 2*d + 1) {
+		c = rem - (2*d + 1) - 1;
 	}	
 	else if (rem > d) {
-		c = rem - d;
+		c = rem - d - 1;
+	}
+	else if (rem > 0) {
+		c = rem - 1;
 	}
 	else {
-		c = rem;
+		c = d - 1;
 	}
+	//cout << i << ", " << d << ", " << rem << ", " << c << endl;
 	return c;	
 }
 
@@ -88,8 +107,54 @@ void Triangle_ColorCode2::applyCorrection(pairlist matching) {
 }
 
 void Triangle_ColorCode2::genCorrPairErrs(double p1, double p2) {
-	cout << "COLOR CODE: CorrPairErrs Method Not Written Yet." << endl;
-	abort();
+	assert((p1 + p2) < 1);	
+	// number of possible correlated errors
+	int ncorr = 3;
+	int nX = nrows * ncols;
+	for (int i = 0; i < (int) data.size(); i++){
+		double randval = (double) mtrand() / mtrand.max();
+		if (randval < p1){
+			data[i].err = !data[i].err;
+		}
+		int r = itor(i);
+		int c = itoc(i);
+		if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {
+			// weight 2 errors
+			vector<int> adj;
+			// generate ncorr random variables
+			vector<int> rands(ncorr);
+			for (uint k = 0; k < rands.size(); k++) {
+				if ((double) mtrand() / mtrand.max() < p2) {
+					rands[k] = 1;
+				}
+				else{
+					rands[k] = 0;
+				}
+			}	
+			if (c > 0) {
+				adj.push_back(rctoi(r, c-1));	
+			} 
+			if (c < rowmax(r) - 1) {
+				if (r % 3 == 2)
+					adj.push_back(rctoi(r-1, c-1));
+				else
+					adj.push_back(rctoi(r-1, c));
+			}
+			if (r < (3*nrows)) {
+				if (r % 3 == 1)
+					adj.push_back(rctoi(r+1, c+1));
+				else 
+					adj.push_back(rctoi(r+1, c));
+			}
+			for (uint k = 0; k < adj.size(); k++) {
+				if (rands[k])	{
+					data[i].err = !data[i].err;	
+					data[adj[k]].err = !data[adj[k]].err;				
+				}
+			}
+					
+		}
+	}
 }
 
 void Triangle_ColorCode2::printLattice(ostream& out) {

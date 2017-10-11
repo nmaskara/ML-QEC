@@ -39,7 +39,7 @@ rem5a = getRem(model5a, indat, outdat)
 rem5b = getRem(model5b, indat, outdat)
 rem5c = getRem(model5c, indat, outdat)'''
 
-datsz = str(1000000)
+datsz = str(100000)
 direc = sys.argv[1]
 outfile = open(sys.argv[2], 'w')
 
@@ -68,7 +68,7 @@ for fil in os.listdir(direc):
 		print "UNKOWN TYPE : " + args[0]
 		sys.exit()
 	#for ptxt in np.arange(10, 200, 10):
-	for ptxt in [1, 10, 100]:
+	for ptxt in [10, 50, 100]:
 		p = float(ptxt) / 1000
 		print p
 		ptxt = str(ptxt)

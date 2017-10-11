@@ -64,20 +64,24 @@ void testnum() {
 
 
 void simpletest(string dirname = "", string filename = "") {
-	int nrows = 11;
-	int ncols = 11;
+	int nrows = 3;
+	int ncols = 3;
 	Triangle_ColorCode2 L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
+	
 	do {
 	ofstream out(dirname + filename + "_info.txt");
-	L.generateErrors(0.1);
-	//L.genCorrPairErrs(0,0.02);
+	L.clear();
+	//L.generateErrors(0.1);
+	L.genCorrPairErrs(0.1,0.1);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);
-	L.printErrors(cout);
+	//L.printErrors(cout);
+	cout << "Generated Errors" << endl;
 	L.printLattice(cout);	
+
 	Decoder D;
 	//D.runDecode(L, dirname + filename + "_edges.txt", dirname + filename + "_matched.txt");
 
@@ -92,10 +96,11 @@ void simpletest(string dirname = "", string filename = "") {
 	L.printErrors(out);
 	out.close();
 	//if (!save && L.getXerrors().size() == 0) remove(fname.c_str());
+	cout << "Applied Correction" << endl;
 	L.printLattice(cout);
 	assert((L.getErrors()).size() == 0);
 	cout << "Correction: " << L.checkCorrection() << endl;
-	} while (true /*!L.checkCorrection()*/);
+	} while (!L.checkCorrection());
 	L.printLattice(cout);
 }
 

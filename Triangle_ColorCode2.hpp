@@ -8,6 +8,7 @@
 #include <csignal>
 #include <random>
 #include <assert.h>
+#include <cmath>
 #include "Base_Lattice.hpp"
 
 using namespace std;

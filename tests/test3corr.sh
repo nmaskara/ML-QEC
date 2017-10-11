@@ -1,9 +1,9 @@
 #!/bin/bash -x
 
-lattype='square'
-latsize=3
-p=0.01
-ptxt=10
+lattype='cc2'
+latsize=7
+p=0.027
+ptxt=27
 pratio=1
 opt='adam'
 

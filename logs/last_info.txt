@@ -1,0 +1,16 @@
+X 
+
+1 means error
+   _   
+  X _  
+ 1 _ X 
+1 . _ 1
+
+1 means error
+   _   
+  . _  
+ 1 1 . 
+_ . _ 1
+
+. 
+
