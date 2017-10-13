@@ -12,7 +12,7 @@ numnodes=100
 datasize=-1
 valsize=100000
 steps=1000
-epochs=50
+epochs=2
 
 dt='cc2depol' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then

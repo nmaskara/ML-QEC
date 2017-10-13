@@ -144,9 +144,6 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		insize = 3 * nrows * (nrows+1) / 2
 
 	cstr = ''
-	if (depol):
-		insize *= 2
-		cstr += '_depol'
 	if (copy > 0):
 		cstr += '_' + str(copy)
 	
