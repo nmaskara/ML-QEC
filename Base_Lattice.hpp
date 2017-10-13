@@ -12,6 +12,7 @@ using namespace std;
 
 struct qubit {
 	bool err;
+	bool derr;
 };
 
 typedef vector<int> qmap;	// Maps a list of qubits to a set of measurement bits
@@ -27,10 +28,14 @@ public:
 	int nrows, ncols, ndats, nerrs;
 	vector<qmap> X;
 	vector<mmap> mX;
+	vector<qmap> Z;
+	vector<mmap> mZ;
+
+
 
 	qarray data;
 	vector<int> check;
-
+	vector<int> dualcheck;
 	mt19937 mtrand;
 	// Helper functions
 	virtual int rctoi(int row, int col);
@@ -41,6 +46,7 @@ public:
 
 	// Returns an array of locations of errors in check matrix
 	vector<int> getErrors();
+	vector<int> getDualErrors();
 	// Returns an arry of distances between each pair of errors
 	// in th order (0,1), (0,2)...(1,0), (1,1)...
 	// where the numbers are the indexes of the errors in the
@@ -50,10 +56,13 @@ public:
 	qarray getData();
 	// Returns the check array
 	vector<int> getCheck();
+	vector<int> getDualCheck();
 	// prints the error syndrome to the ostream specified
 	void printErrors(ostream& = cout);
 	// gnerate random errors with rate errRate
 	void generateErrors(double errRate);
+
+	void generateDepolarizingErrors(double errRate);
 	//recalculate check matrix based on data array
 	void checkErrors();
 	// manually set random seed
@@ -70,6 +79,7 @@ public:
 	
 	// Determine if the correction produced a logical error (false)
 	virtual int checkCorrection();
+	virtual int checkDualCorrection();
 	// Calculate the distance between two measurement qubits
 	virtual int calcDist(int i1, int i2);
 	// Calculate the data qubits connecting two meausrememnt qubits

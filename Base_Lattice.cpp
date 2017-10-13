@@ -40,6 +40,8 @@ void Base_Lattice::init(int width, int height) {
 	nrows = height;
 	check.resize(width * height);
 	fill(check.begin(), check.end(), 0);
+	dualcheck.resize(width * height);
+	fill(dualcheck.begin(), dualcheck.end(), 0);
 	nerrs = width * height;
 	mtrand = RandomlySeededMersenneTwister();
 }
@@ -54,6 +56,15 @@ void Base_Lattice::printErrors(ostream& out) {
 		}
 		out << endl;
 	}
+	vector<int>::iterator z = dualcheck.begin();
+	for (int r = 0; r < nrows; r++ ) {
+		for (int c = 0; c < ncols; c++){
+			if (*z)							out << "Z ";
+			else							out << ". ";
+			z++;
+		}
+		out << endl;
+	}
 	out << endl;	
 }
 
@@ -61,6 +72,15 @@ vector<int> Base_Lattice::getErrors() {
 	vector<int> errors;
 	for (uint i = 0; i < check.size(); i++) {
 		if (check[i])
+			errors.push_back(i);
+	}
+	return errors;
+}
+
+vector<int> Base_Lattice::getDualErrors() {
+	vector<int> errors;
+	for (uint i = 0; i < dualcheck.size(); i++) {
+		if (dualcheck[i])
 			errors.push_back(i);
 	}
 	return errors;
@@ -86,6 +106,10 @@ vector<int> Base_Lattice::getCheck() {
 	return check;
 }
 
+vector<int> Base_Lattice::getDualCheck() {
+	return dualcheck;
+}
+
 qarray Base_Lattice::getData() {
 	return data;
 }
@@ -94,9 +118,22 @@ void Base_Lattice::generateErrors(double errRate) {
 	for (qarray::iterator i = data.begin(); i != data.end(); i++ ){
 		double randval = (double) mtrand() / mtrand.max();
 		if (randval < errRate)
-			i->err = true;
-		else
-			i->err = false;
+			i->err = !(i->derr);
+	}
+}
+
+void Base_Lattice::generateDepolarizingErrors(double errRate) {
+	for (qarray::iterator i = data.begin(); i != data.end(); i++ ){
+		double randval = (double) mtrand() / mtrand.max();
+		if (randval < errRate / 3)
+			i->err = !(i->err);
+		else if (randval < 2 * errRate / 3)
+			i->derr = !(i->derr);
+		else if(randval < errRate){
+			i->err = !(i->err);
+			i->derr = !(i->derr);
+		}	
+
 	}
 }
 
@@ -109,6 +146,15 @@ void Base_Lattice::checkErrors() {
 		err %= 2;
 		if (err) check[i] = 1;
 		else	 check[i] = 0; 
+	}
+	for (uint i = 0; i < dualcheck.size(); i++) {
+		int err = 0;
+		for (vector<mmap>::iterator mm = mZ.begin(); mm != mZ.end(); mm++) {
+			if ((*mm)[i] != -1 && data[(*mm)[i]].derr) err++;
+		}
+		err %= 2;
+		if (err) dualcheck[i] = 1;
+		else	 dualcheck[i] = 0; 
 	}
 }
 
@@ -154,6 +200,9 @@ void Base_Lattice::applyCorrection(pairlist matching) {
 
 
 int Base_Lattice::checkCorrection() {
+	return 0;
+}
+int Base_Lattice::checkDualCorrection() {
 	return 0;
 }
 

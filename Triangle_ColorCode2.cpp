@@ -94,7 +94,13 @@ void Triangle_ColorCode2::applyCorrection(pairlist matching) {
 			data[*p].err = !data[*p].err;
 		}
 	}
-
+	vector<int> zerrors = getDualErrors();
+	for (vector<int>::iterator i = zerrors.begin(); i != zerrors.end(); i++) {
+		vector<int> path = pathToBoundary(*i);
+		for (vector<int>::iterator p = path.begin(); p != path.end(); p++) {
+			data[*p].derr = !data[*p].derr;
+		}
+	}
 	/*checkErrors();
 	errors = getErrors();
 	cout << errors.size() << endl;
@@ -184,8 +190,58 @@ void Triangle_ColorCode2::printLattice(ostream& out) {
 
 					}
 					else {
-						if (d->err)		out << "1";
-						else			out << "_";
+						if (d->err && d->derr)	out << "3";
+						else if (d->err)		out << "1";
+						else if (d->derr)		out << "2";
+						else					out << "_";
+						d++;					
+					}
+				}
+				else {
+					out << " ";
+				}
+			}
+			else{
+				out << " ";
+			}
+		}
+		out << endl;
+	}
+	out << endl;
+	assert(d == data.end());
+}
+
+void Triangle_ColorCode2::printDualLattice(ostream& out) {
+	vector<int>::iterator x = dualcheck.begin();
+	vector<qubit>::iterator d = data.begin();
+	out << "1 means error" << endl;
+	int N = 3*nrows;
+	//int size = nrows * ncols;
+	// counter variables record position on the lattice
+	int checkrow = 0;
+	int checkcol = 0;
+	for (int r = 0; r <= 3*nrows; r++) {
+		for (int c = 0; c <= 6*ncols; c++) {
+			if (r+c >= N && c-r <= N) {
+				if ( (r+c) % 2 == N % 2) {
+					if (c % 3 == 2) {
+						int row = checkrow/3;
+						int rem = checkrow % 3;
+						int index = 3*(row * (row+1) / 2  + checkcol) + rem;
+						if (dualcheck[index])		out << "Z";
+						else						out << ".";
+						checkcol += 1;	
+						if (checkcol > row){
+							checkcol = 0;
+							checkrow += 1;							
+						} 
+
+					}
+					else {
+						if (d->err && d->derr)	out << "3";
+						else if (d->err)		out << "1";
+						else if (d->derr)		out << "2";
+						else					out << "_";
 						d++;						
 					}
 				}
@@ -281,6 +337,7 @@ void Triangle_ColorCode2::init_maps() {
 	mX.push_back(m3);
 	mX.push_back(m4);
 	mX.push_back(m5);
+	mZ = mX;
 }
 
 Triangle_ColorCode2::Triangle_ColorCode2(int width, int height) : Base_Lattice(width, height) {
@@ -290,6 +347,8 @@ Triangle_ColorCode2::Triangle_ColorCode2(int width, int height) : Base_Lattice(w
 	nrows = height / 2;
 	check.resize(3 * nrows * (nrows + 1) / 2);
 	fill(check.begin(), check.end(), 0);
+	dualcheck.resize(3 * nrows * (nrows + 1) / 2);
+	fill(dualcheck.begin(), dualcheck.end(), 0);
 	nerrs = 3 * nrows * (nrows + 1) / 2;
 	data.resize(latsize(width));
 	ndats = latsize(width);
@@ -358,6 +417,15 @@ int Triangle_ColorCode2::checkCorrection() {
 	int count = 0;
 	for (uint i = 0; i < data.size(); i++) {
 		count += int(data[i].err);
+	}
+	return count % 2;
+}
+
+int Triangle_ColorCode2::checkDualCorrection() {
+	// return parity of sum of all qubits.
+	int count = 0;
+	for (uint i = 0; i < data.size(); i++) {
+		count += int(data[i].derr);
 	}
 	return count % 2;
 }

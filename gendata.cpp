@@ -14,7 +14,7 @@
 #include <time.h>
 #include <random>
 
-void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag, int seed=-1, float p2=0) {
+void writeTestData(string fname, string type, int latsize, int numtrials, double prate, bool randflag=false, bool depol=false, int seed=-1, float p2=0) {
 	int nrows = latsize;
 	int ncols = latsize;
 	ofstream out(fname);
@@ -48,16 +48,20 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		else if (randflag) p = (double) prate * mtrand() / mtrand.max();
 		else p = prate;
 		L->clear();
-		if (p2 == 0)
+		if (p2 == 0 && !depol)
 			L->generateErrors(p);
+		else if (p2 == 0 && depol)
+			L->generateDepolarizingErrors(p);
 		else
 			L->genCorrPairErrs(p, p2);
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
+		vector<int> zerrors = L->getDualCheck();
 		pairlist matching;
 		if (type != "cc" && type != "cc2")
 			matching = D.matchTopLeft(L->getErrors());
 		int result;
+		int dresult;
 		if (type == "surface") {
 			result = L->checkCorrection();
 		}
@@ -74,7 +78,9 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 			}*/
 			L->checkErrors();
 			assert(L->getErrors().size() == 0);
-			result = L->checkCorrection();			
+			result = L->checkCorrection();		
+			if (depol)	
+				dresult = L->checkDualCorrection();
 			assert(result == r2);
 			//L.printLattice();
 			///cout << result << endl;
@@ -83,6 +89,9 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 
 		for (int i = 0; i < L->nerrs; i++) {
 			out << errors[i] << ", ";
+			if (depol) {
+				out << zerrors[i] << ", ";
+			}
 		}
 		int numcat;
 		if (type == "cc")
@@ -96,6 +105,12 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 				out << "1, ";
 			else 
 				out << "0, ";
+			if (depol) {
+				if (dresult == i)
+					out << "1, ";
+				else
+					out << "0, ";
+			}
 		}
 		out << endl;
 		if (i % 100000 == 0) {
@@ -117,6 +132,7 @@ int main(int argc, char** argv) {
 	int pos = 5;
 	int id = -1;
 	bool randflag = false;
+	bool depolflag = false;
 	int seed = -1;
 	int pratio = 0;
 	while (pos < argc) {
@@ -125,6 +141,7 @@ int main(int argc, char** argv) {
 		string sid = "-i";		
 		string ssid = "-s";
 		string corr = "-c";
+		string depol = "-d";
 		if (!rf.compare(argv[pos])) {
 			randflag = true;
 		}
@@ -139,6 +156,9 @@ int main(int argc, char** argv) {
 		else if (!corr.compare(argv[pos])) {
 			assert(pos+1 < argc);
 			pratio = atoi(argv[pos+1]);
+		}
+		else if (!depol.compare(argv[pos])) {
+			depolflag = true;
 		}
 		pos++;
 	}
@@ -161,6 +181,9 @@ int main(int argc, char** argv) {
 	}
 	if (pratio != 0) {
 		filename += "_corr_" + to_string(pratio);
+	}
+	if (depolflag) {
+		filename += "_depol";
 	}
 	filename += ".csv";
 	cout << id << ", " << seed << endl;

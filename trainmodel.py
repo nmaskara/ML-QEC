@@ -118,7 +118,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	return model
 
 def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p0=(0.1, 0)):
+	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p0=(0.1, 0), depol=False):
 
 	trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
@@ -142,11 +142,14 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	if (lattype == "cc2"):
 		nrows = latsize/2
 		insize = 3 * nrows * (nrows+1) / 2
-	if (copy > 0):
-		cstr = '_' + str(copy)
 
-	else:
-		cstr = ''
+	cstr = ''
+	if (depol):
+		insize *= 2
+		cstr += '_depol'
+	if (copy > 0):
+		cstr += '_' + str(copy)
+	
 	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + opttype + cstr + ".hdf5"
 	bestmodelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
@@ -167,6 +170,8 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		numcat = 2
 	else:
 		numcat = 4
+	if (depol):
+		numcat *= 2
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
@@ -226,6 +231,7 @@ if __name__ == "__main__":
 	numparams = 12
 	copies = 0
 	pratio = 0
+	depol = False
 	if ('-copy' in sys.argv):
 		index = sys.argv.index('-copy')
 		copies = int(sys.argv[index+1])
@@ -236,6 +242,10 @@ if __name__ == "__main__":
 		pratio = int(sys.argv[index+1])
 		del sys.argv[index]
 		del sys.argv[index]
+	if ('-d' in sys.argv):
+		index = sys.argv.index('-d')
+		depol = True
+		del sys.argv[index]	
 	if (len(sys.argv) != 13):
 		print "usage: type opttype latsize stepsperepoch epochs numnodes hiddenlayers batchsize datasize p valsize date"
 		sys.exit()
@@ -264,15 +274,20 @@ if __name__ == "__main__":
 		filename += '_corr_' + str(pratio)
 		valname += '_corr_' + str(pratio)
 
+	if (depol):
+		filename += '_depol'
+		valname += '_depol'
+
+
 	if (copies > 0):
 		count = 1
 		while count <= copies:
 			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p0=(p, pratio))
+				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p0=(p, pratio), depol=depol)
 			count += 1
 	else:
 		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p0=(p, pratio))
+				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p0=(p, pratio), depol=depol)
 
 
 	'''
