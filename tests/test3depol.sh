@@ -1,13 +1,13 @@
 #!/bin/bash -x
 
 lattype='cc2'
-latsize=3
+latsize=5
 p=0.1
 ptxt=100
 opt='adam'
 
 batchsize=1000
-numlayers=1
+numlayers=3
 numnodes=100
 datasize=-1
 valsize=100000
@@ -28,7 +28,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt'_depol'
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_depol'
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
-for numnodes in 50 100 200
+for numnodes in 100
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt -d

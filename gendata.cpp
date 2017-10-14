@@ -100,6 +100,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 			numcat = 2;
 		else
 			numcat = 4;
+
 		for (int i = 0; i < numcat; i++) {
 			if (result == i)
 				out << "1, ";

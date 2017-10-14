@@ -75,7 +75,7 @@ void simpletest(string dirname = "", string filename = "") {
 	L.clear();
 	//L.generateErrors(0.1);
 	//L.genCorrPairErrs(0.1,0.1);
-	L.generateDepolarizingErrors(0.1);
+	L.generateDepolarizingErrors(0.01);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);

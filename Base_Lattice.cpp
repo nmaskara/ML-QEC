@@ -173,8 +173,12 @@ int Base_Lattice::countQubitErrors() {
 void Base_Lattice::clear() {
 	for (qarray::iterator i = data.begin(); i != data.end(); i++) {
 		i->err = false;
+		i->derr = false;
 	}
 	for (vector<int>::iterator i = check.begin(); i != check.end(); i++) {
+		*i = 0;
+	}
+	for (vector<int>::iterator i = dualcheck.begin(); i != dualcheck.end(); i++) {
 		*i = 0;
 	}
 }

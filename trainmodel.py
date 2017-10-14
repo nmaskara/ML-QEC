@@ -167,8 +167,13 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		numcat = 2
 	else:
 		numcat = 4
+
 	if (depol):
+		insize *= 2
 		numcat *= 2
+
+	print "insize: " + str(insize)
+	print "numcat: " + str(numcat)
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
