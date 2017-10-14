@@ -101,17 +101,17 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		else
 			numcat = 4;
 
+		if (depol) {
+			result = (dresult * numcat) + result;
+			numcat *= 2;
+
+		}
+
 		for (int i = 0; i < numcat; i++) {
 			if (result == i)
 				out << "1, ";
 			else 
 				out << "0, ";
-			if (depol) {
-				if (dresult == i)
-					out << "1, ";
-				else
-					out << "0, ";
-			}
 		}
 		out << endl;
 		if (i % 100000 == 0) {
