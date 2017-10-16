@@ -67,23 +67,48 @@ for fil in os.listdir(direc):
 	else:
 		print "UNKOWN TYPE : " + args[0]
 		sys.exit()
+	depol = False
+
+	if (args[4] == 'depol'):
+		depol = True
+		numcats *= 2
+		lsiz *= 2
+
+	pratio = 0
+	corr = False
+	if (args[4] == 'corr'):
+		pratio = int(args[5])
+		corr = True
+
+
 	#for ptxt in np.arange(10, 200, 10):
-	for ptxt in [10, 50, 100]:
+	for ptxt in range(5, 60, 5):
 		p = float(ptxt) / 1000
 		print p
 		ptxt = str(ptxt)
 
 		cmd = ' '.join(['./gendata', args[0], args[1], datsz, str(p)])
+		if (depol):
+			cmd += ' -d'
+		if (corr):
+			cmd += ' -c ' + str(pratio)
 		#if len(args) == 10:
 		#	ptxt += '_corr_' + str(args[5])
 		#	cmd += ' -c ' + str(args[5])
-		filename = 'data/' + '_'.join([args[0], args[1], datsz, ptxt]) + '.csv'
+
+		filename = 'data/' + '_'.join([args[0], args[1], datsz, ptxt])
+		if (depol):
+			filename += '_depol'
+		if (corr):
+			filename += '_corr_' + str(pratio)
+		filename += '.csv'
+
 		if not os.path.exists(filename):
 			print cmd
 			os.system(cmd)
 
-		dat = pd.read_csv('data/' + '_'.join([args[0], args[1], datsz, ptxt]) + '.csv').values
-		print "loaded data: " + '_'.join([args[0], args[1], datsz, ptxt])
+		dat = pd.read_csv(filename).values
+		print "loaded data: " + filename
 
 		loss, acc = model.evaluate(dat[:,0:lsiz], dat[:,lsiz:lsiz+numcats])
 		print loss, 1-acc
