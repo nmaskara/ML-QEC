@@ -104,7 +104,6 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		if (depol) {
 			result = (dresult * numcat) + result;
 			numcat *= 2;
-
 		}
 
 		for (int i = 0; i < numcat; i++) {
@@ -188,5 +187,5 @@ int main(int argc, char** argv) {
 	}
 	filename += ".csv";
 	cout << id << ", " << seed << endl;
-	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, seed=seed, p2=p2);
+	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, depolflag, seed=seed, p2=p2);
 }

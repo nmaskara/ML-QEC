@@ -19,13 +19,18 @@ print ptxt
 cstr = ''
 if len(sys.argv) > 5:
 	if sys.argv[5] == '-c':
-		cstr = '_corr_' + sys.argv[6]
+		cstr += '_corr_' + sys.argv[6]
+	if (sys.argv[5] == '-d'):
+		cstr += '_depol'
 
 if (datasize < incsize):
 	incsize = datasize
 	
 inname = 'data/' + sys.argv[1] + '_' + sys.argv[2] + '_' + str(incsize) + '_' + ptxt + cstr + '.csv'
 outname = 'data/'+ sys.argv[1] + '_' + sys.argv[2] + '_' + sys.argv[3] + '_' + ptxt + cstr + '.h5'
+
+print inname
+print outname
 
 if os.path.exists(outname):
 	os.remove(outname)
