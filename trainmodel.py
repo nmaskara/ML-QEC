@@ -45,7 +45,7 @@ def make_exist(path):
 		if exception.errno != errno.EEXIST:
 			raise
 
-def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads, countstart, depol):
+def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads, depol):
 	latsize = str(latsize)
 	p = str(p)
 	ptxt = str(int(float(p)*1000))
@@ -57,8 +57,7 @@ def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads
 	if (depol):
 		tail += '_depol'
 	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + tail + '.csv'
-	count = countstart
-	flags = ' -s ' + str(random.randint(0, sys.maxint))#str(threadid + numthreads * count)
+	flags = ' -s ' + str(random.randint(0, sys.maxint))
 	if pratio > 0:
 		flags += ' -c ' + str(pratio)
 	if depol:
@@ -69,8 +68,6 @@ def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads
 		df = pd.read_csv(inname)
 		vals = df.values[:,:-1].astype(bool)
 		dataqueue.put(vals)
-		count += 1
-		#print str(threadid) + '\t' + str(dataqueue.qsize())
 
 def genparallel(insize, numcat, dataqueue):
 	while True:
@@ -105,8 +102,6 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 			model.add(Dense(units=num_nodes, kernel_initializer='he_normal'))
 		model.add(BatchNormalization())
 		model.add(Activation('relu'))
-		#act = advanced_activations.PReLU()
-		#model.add(act)
 		if (first):
 			first = False
 	layer3 = Dense(units=numcat, activation='softmax')
@@ -121,10 +116,107 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
-def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-	hiddenlayers, batchsize, filename, valname, dirname, copy=0, gendata=False, p0=(0.1, 0), depol=False):
+def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, depol=False, trainfilename=None, initial_epoch=0 ):
+	insize = latsize * latsize
+	if (lattype == "cc2"):
+		nrows = latsize/2
+		insize = 3 * nrows * (nrows+1) / 2
 
-	trainfilename = "data/" + filename + ".h5"
+	if (lattype == "cc"):
+		numcat = 16
+	elif (lattype == "open_square"):
+		numcat = 16
+	elif (lattype == "surface"):
+		numcat = 2
+	elif (lattype == "cc2"):
+		numcat = 2
+	else:
+		numcat = 4
+
+	if (depol):
+		insize *= 2
+		numcat *= 2
+
+	print "insize: " + str(insize)
+	print "numcat: " + str(numcat)
+
+	processes = []
+	if (trainfilename == None):
+		NUMTHREADS=4
+		dataqueue = Queue(int(100))
+		#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
+		countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
+		for i in range(NUMTHREADS-1):
+			gendat = Process(target=genset, args=(lattype, latsize, p, pratio, batchsize, i, dataqueue, NUMTHREADS-1, depol))
+			gendat.start()
+			processes.append(gendat)
+		iterator = genparallel(insize, numcat, dataqueue)
+	else:
+		iterator = genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch)
+		
+	print iterator
+
+	lastcheckpt = ModelCheckpoint(modelpath, save_best_only=False)
+	record = mycallback(resultpath, stepsperepoch)
+
+
+	hist = model.fit_generator( \
+		iterator,\
+		stepsperepoch,  \
+		epochs=numepochs, initial_epoch=initial_epoch, \
+		callbacks=[lastcheckpt, record], verbose=1)
+
+	print hist
+	for p in processes:
+		p.terminate()
+		p.join()
+
+def getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers, batchsize, dirname, depol=False):
+	cstr = ''
+	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + cstr + ".hdf5"
+	bestmodelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + cstr + "_best.hdf5"
+	resultpath = "results/" + dirname + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
+		"_" + str(batchsize) + "_" + opttype + cstr + ".csv"
+
+	insize = latsize * latsize
+	if (lattype == "cc2"):
+		nrows = latsize/2
+		insize = 3 * nrows * (nrows+1) / 2
+
+	if (lattype == "cc"):
+		numcat = 16
+	elif (lattype == "open_square"):
+		numcat = 16
+	elif (lattype == "surface"):
+		numcat = 2
+	elif (lattype == "cc2"):
+		numcat = 2
+	else:
+		numcat = 4
+
+	if (depol):
+		insize *= 2
+		numcat *= 2
+
+	print "insize: " + str(insize)
+	print "numcat: " + str(numcat)
+
+	# If model already exists, load model
+	if os.path.isfile(modelpath):
+		print "Loaded Previous Model"
+		model = load_model(modelpath)
+	else:
+		# otherwise, generate model
+		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
+
+	return (model, modelpath, resultpath)
+
+def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
+	hiddenlayers, batchsize, filename, valname, dirname, gendata=False, p0=(0.1, 0), depol=False):
+
+	'''trainfilename = "data/" + filename + ".h5"
 	valfilename = "data/" + valname + ".csv"
 
 	if not os.path.isfile(valfilename):
@@ -148,8 +240,6 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		insize = 3 * nrows * (nrows+1) / 2
 
 	cstr = ''
-	if (copy > 0):
-		cstr += '_' + str(copy)
 	
 	modelpath = "models/" + dirname + '/' + filename + "_" + str(numnodes) + '_' + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + opttype + cstr + ".hdf5"
@@ -179,13 +269,6 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	print "insize: " + str(insize)
 	print "numcat: " + str(numcat)
 
-	# If model already exists, load model
-	if os.path.isfile(modelpath):
-		print "Loaded Previous Model"
-		model = load_model(modelpath)
-	else:
-	# otherwise, generate model
-		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
 
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
@@ -193,11 +276,13 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		model = load_model(modelpath)
 	else:
 		# otherwise, generate model
-		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
+		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)'''
+
+	model, modelpath, resultpath = getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers,batchsize, dirname, depol=depol)
 
 	initial_epoch = 0
 
-	if os.path.isfile(resultpath):
+	'''if os.path.isfile(resultpath):
 		toread = open(resultpath, 'r')
 		initial_epoch = len(toread.readlines())
 		toread.close()
@@ -210,10 +295,9 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 		#rd = Process(target=readdat, args=(dataqueue, insize, numcat))
 		countstart = (initial_epoch * stepsperepoch) / (NUMTHREADS-1)
 		for i in range(NUMTHREADS-1):
-			gendat = Process(target=genset, args=(lattype, latsize, p, pratio, batchsize, i, dataqueue, NUMTHREADS-1, countstart, depol))
+			gendat = Process(target=genset, args=(lattype, latsize, p, pratio, batchsize, i, dataqueue, NUMTHREADS-1, depol))
 			gendat.start()
 			processes.append(gendat)
-
 		iterator = genparallel(insize, numcat, dataqueue)
 	else:
 		iterator = genbatches(trainfilename, insize, numcat, batchsize, initial_epoch, stepsperepoch)
@@ -229,7 +313,9 @@ def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	print hist
 	for p in processes:
 		p.terminate()
-		p.join()
+		p.join()'''
+
+	train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 
 
 # execute

@@ -2,11 +2,11 @@
 
 lattype='cc2'
 latsize=9
-p=0.12
-ptxt=120
+p=0.15
+ptxt=150
 opt='adam'
 
-batchsize=10000
+batchsize=100
 numlayers=1
 numnodes=100
 datasize=-1
