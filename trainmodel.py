@@ -152,6 +152,8 @@ def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepoch
 
 	valdata = pd.read_csv(valfilename).values
 
+	print "error rate: " + str(p)
+
 	processes = []
 	if (trainfilename == None):
 		NUMTHREADS=4
