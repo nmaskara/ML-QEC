@@ -400,17 +400,6 @@ if __name__ == "__main__":
 	print "Training"
 	train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 
-	if (copies > 0):
-		count = 1
-		while count <= copies:
-			trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, copy=count, gendata=gendata, p0=(p, pratio), depol=depol)
-			count += 1
-	else:
-		trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
-				hiddenlayers, batchsize, filename, valname, dirname, gendata=gendata, p0=(p, pratio), depol=depol)
-
-
 	'''
 	outpath = "results/" + date + '/' + filename + "_" + str(numnodes) + "_" + str(hiddenlayers) + \
 		"_" + str(batchsize) + "_" + acttype + "_" + opttype + ".csv"
