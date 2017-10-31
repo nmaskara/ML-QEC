@@ -116,7 +116,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 	model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
-def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, depol=False, trainfilename=None, initial_epoch=0 ):
+def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, valname, depol=False, trainfilename=None, initial_epoch=0 ):
 	insize = latsize * latsize
 	if (lattype == "cc2"):
 		nrows = latsize/2
@@ -139,6 +139,18 @@ def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepoch
 
 	print "insize: " + str(insize)
 	print "numcat: " + str(numcat)
+
+	valfilename = "data/" + valname + ".csv"
+
+	if not os.path.isfile(valfilename):
+		print "Couldn't find validation data at : " + valfilename
+		sys.exit(0)
+	if (not gendata):
+		if not os.path.isfile(trainfilename):
+			print "Couldn't find training data at : " + trainfilename	
+			sys.exit(0)
+
+	valdata = pd.read_csv(valfilename).values
 
 	processes = []
 	if (trainfilename == None):
@@ -164,7 +176,8 @@ def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepoch
 		iterator,\
 		stepsperepoch,  \
 		epochs=numepochs, initial_epoch=initial_epoch, \
-		callbacks=[lastcheckpt, record], verbose=1)
+		callbacks=[lastcheckpt, record], verbose=1, \
+		validation_data=(valdata[:,0:insize], valdata[:,insize:insize+numcat]) )
 
 	print hist
 	for p in processes:
@@ -203,15 +216,17 @@ def getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers, batchs
 	print "insize: " + str(insize)
 	print "numcat: " + str(numcat)
 
+	new = True
 	# If model already exists, load model
 	if os.path.isfile(modelpath):
 		print "Loaded Previous Model"
 		model = load_model(modelpath)
+		new = False
 	else:
 		# otherwise, generate model
 		model = makeModel(insize, numnodes, hiddenlayers, opttype, numcat)
 
-	return (model, modelpath, resultpath)
+	return (model, modelpath, resultpath, new)
 
 def trainModel(lattype, opttype, latsize, stepsperepoch, numepochs, numnodes, \
 	hiddenlayers, batchsize, filename, valname, dirname, gendata=False, p0=(0.1, 0), depol=False):
@@ -370,6 +385,18 @@ if __name__ == "__main__":
 		filename += '_depol'
 		valname += '_depol'
 
+	model, modelpath, resultpath, new = getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers,batchsize, dirname, depol=depol)
+
+	if (datasize == -1):
+		filename = None
+
+	initial_epoch = 0
+	if (new):
+		print "Starting pre-training"
+		train(model, lattype, latsize, p/2, pratio, batchsize, stepsperepoch, 1, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+
+	print "Training"
+	train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 
 	if (copies > 0):
 		count = 1

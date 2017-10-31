@@ -6,7 +6,7 @@ p=0.15
 ptxt=150
 opt='adam'
 
-batchsize=100
+batchsize=10
 numlayers=1
 numnodes=100
 datasize=-1
