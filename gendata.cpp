@@ -24,16 +24,20 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 
 	if (type == "square")
 		L = new Lattice(nrows, ncols);
-	if (type == "triangle")
+	else if (type == "triangle")
 		L = new Triangle(nrows, ncols);
-	if (type == "Hexagonal")
+	else if (type == "Hexagonal")
 		L = new Hexagonal(nrows, ncols);
-	if (type == "cc")
+	else if (type == "cc")
 		L = new Triangle_ColorCode(nrows, ncols);
-	if (type == "cc2")
+	else if (type == "cc2")
 		L = new Triangle_ColorCode2(nrows, ncols);
-	if (type == "surface")
+	else if (type == "surface")
 		L = new Lattice2(nrows, ncols);
+	else {
+		cout << "invalid type " << endl;
+		abort();
+	}
 
 	/*if (seed != -1) {
 		L->setSeed(seed);
@@ -52,8 +56,10 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 			L->generateErrors(p);
 		else if (p2 == 0 && depol)
 			L->generateDepolarizingErrors(p);
-		else
+		else if (p2 == 0 && !depol)
 			L->genCorrPairErrs(p, p2);
+		else
+			L->genDepolCorrPairErrs(p, p2);
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
 		vector<int> zerrors = L->getDualCheck();
@@ -61,7 +67,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		if (type != "cc" && type != "cc2")
 			matching = D.matchTopLeft(L->getErrors());
 		int result;
-		int dresult;
+		int dresult = 0;
 		if (type == "surface") {
 			result = L->checkCorrection();
 		}
@@ -170,7 +176,7 @@ int main(int argc, char** argv) {
 	float p2 = 0;
 	if (pratio != 0)
 		p2 = error_rate / pratio;
-
+	cout << "Generating " << type << "\tlatsize: " << latsize << "\tp: " << error_rate << ", " << p2 << "\tsamples: " << numtrials << endl;
 	string filename = "data/" + type + "_" + to_string(latsize) + "_" + to_string(numtrials) + 
 		"_" + to_string(int(error_rate * 1000));
 	if (randflag) {
@@ -186,6 +192,5 @@ int main(int argc, char** argv) {
 		filename += "_depol";
 	}
 	filename += ".csv";
-	cout << id << ", " << seed << endl;
 	writeTestData(filename, type, latsize, numtrials, error_rate, randflag, depolflag, seed=seed, p2=p2);
 }

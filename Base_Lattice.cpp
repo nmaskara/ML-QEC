@@ -158,9 +158,9 @@ void Base_Lattice::checkErrors() {
 	}
 }
 
-void Base_Lattice::genCorrPairErrs(double p, double k) {
+void Base_Lattice::genCorrPairErrs(double p, double k) {}
 
-}
+void Base_Lattice::genDepolCorrPairErrs(double p, double k) {}
 
 int Base_Lattice::countQubitErrors() {
 	int count = 0;

@@ -112,11 +112,28 @@ void Triangle_ColorCode2::applyCorrection(pairlist matching) {
 	}*/
 }
 
+vector<int> Triangle_ColorCode2::getadj(int r, int c) {
+	vector<int> adj;
+	if (c > 0) {
+		adj.push_back(rctoi(r, c-1));	
+	} 
+	if (c < rowmax(r) - 1) {
+		if (r % 3 == 2)
+			adj.push_back(rctoi(r-1, c-1));
+		else
+			adj.push_back(rctoi(r-1, c));
+	}
+	if (r < (3*nrows)) {
+		if (r % 3 == 1)
+			adj.push_back(rctoi(r+1, c+1));
+		else 
+			adj.push_back(rctoi(r+1, c));
+	}
+	return adj;
+}
+
 void Triangle_ColorCode2::genCorrPairErrs(double p1, double p2) {
 	assert((p1 + p2) < 1);	
-	// number of possible correlated errors
-	int ncorr = 3;
-	int nX = nrows * ncols;
 	for (int i = 0; i < (int) data.size(); i++){
 		double randval = (double) mtrand() / mtrand.max();
 		if (randval < p1){
@@ -126,47 +143,110 @@ void Triangle_ColorCode2::genCorrPairErrs(double p1, double p2) {
 		int c = itoc(i);
 		if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {
 			// weight 2 errors
-			vector<int> adj;
-			// generate ncorr random variables
-			vector<int> rands(ncorr);
-			for (uint k = 0; k < rands.size(); k++) {
-				if ((double) mtrand() / mtrand.max() < p2) {
-					rands[k] = 1;
-				}
-				else{
-					rands[k] = 0;
-				}
-			}	
-			if (c > 0) {
-				adj.push_back(rctoi(r, c-1));	
-			} 
-			if (c < rowmax(r) - 1) {
-				if (r % 3 == 2)
-					adj.push_back(rctoi(r-1, c-1));
-				else
-					adj.push_back(rctoi(r-1, c));
-			}
-			if (r < (3*nrows)) {
-				if (r % 3 == 1)
-					adj.push_back(rctoi(r+1, c+1));
-				else 
-					adj.push_back(rctoi(r+1, c));
-			}
+			vector<int> adj = getadj(r, c);
 			for (uint k = 0; k < adj.size(); k++) {
-				if (rands[k])	{
+				double randval = (double) mtrand() / mtrand.max();
+				if (randval < p2)	{
 					data[i].err = !data[i].err;	
 					data[adj[k]].err = !data[adj[k]].err;				
 				}
-			}
-					
+			}	
+		}
+	}
+}
+
+void Triangle_ColorCode2::genDepolCorrPairErrs(double p1, double p2) {
+	assert((p1 + p2) < 1);	
+	for (int i = 0; i < (int) data.size(); i++){
+		double randval = (double) mtrand() / mtrand.max();
+		if (randval < p1 / 3){
+			data[i].err = !data[i].err;
+		}
+		else if (randval < 2 * p1 / 3) {
+			data[i].err = !data[i].err;
+			data[i].derr = !data[i].derr;
+		}
+		else if (randval < p1) {
+			data[i].derr = !data[i].derr;
+		}
+		int r = itor(i);
+		int c = itoc(i);
+		if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {
+			// weight 2 errors
+			vector<int> adj = getadj(r, c);
+			for (uint k = 0; k < adj.size(); k++) {				
+				double randval = (double) mtrand() / mtrand.max();
+				if (randval < p2 / 9) {
+					// XX error
+					//cout << "XX" << endl;
+					data[i].err = !data[i].err;
+					data[adj[k]].err = !data[adj[k]].err;
+				}
+				else if (randval < 2 * p2 / 9) {
+					// XY error
+					//cout << "XY" << endl;
+					data[i].err = !data[i].err;
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+				else if (randval < 3 * p2 / 9) {
+					// XZ error
+					//cout << "XZ" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+				}
+				else if (randval < 4 * p2 / 9) {
+					// YX error
+					//cout << "YX" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+					data[adj[k]].err = !data[adj[k]].err;
+				}
+				else if (randval < 5 * p2 / 9) {
+					// YY error
+					//cout << "YY" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;		
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;			
+				}
+				else if (randval < 6 * p2 / 9) {
+					// YZ error
+					//cout << "YZ" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+					data[adj[k]].derr = !data[adj[k]].derr;						
+				}
+				else if (randval < 7 * p2 / 9) {
+					// ZX error
+					//cout << "ZX" << endl;
+					data[i].derr = !data[i].derr;						
+					data[adj[k]].err = !data[adj[k]].err;					
+				}
+				else if (randval < 8 * p2 / 9) {
+					// ZY error
+					//cout << "ZY" << endl;
+					data[i].derr = !data[i].derr;						
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+				else if (randval < p2){
+					// ZZ error
+					//cout << "ZZ" << endl;
+					data[i].derr = !data[i].derr;	
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+			}	
 		}
 	}
 }
 
 void Triangle_ColorCode2::printLattice(ostream& out) {
-	vector<int>::iterator x = check.begin();
+	vector<int>::iterator z = dualcheck.begin();
 	vector<qubit>::iterator d = data.begin();
-	out << "1 means error" << endl;
+	out << "1 means X error" << endl;
+	out << "2 means Y error" << endl;
+	out << "3 means Z error" << endl;
 	int N = 3*nrows;
 	//int size = nrows * ncols;
 	// counter variables record position on the lattice
@@ -180,8 +260,15 @@ void Triangle_ColorCode2::printLattice(ostream& out) {
 						int row = checkrow/3;
 						int rem = checkrow % 3;
 						int index = 3*(row * (row+1) / 2  + checkcol) + rem;
-						if (check[index])		out << "X";
-						else					out << ".";
+						if (check[index] && dualcheck[index])
+							out << "Y";
+						else if (check[index])
+							out << "X";
+						else if (dualcheck[index])
+							out << "Z";
+						else
+							out << ".";
+
 						checkcol += 1;	
 						if (checkcol > row){
 							checkcol = 0;
@@ -190,9 +277,9 @@ void Triangle_ColorCode2::printLattice(ostream& out) {
 
 					}
 					else {
-						if (d->err && d->derr)	out << "3";
+						if (d->err && d->derr)	out << "2";
 						else if (d->err)		out << "1";
-						else if (d->derr)		out << "2";
+						else if (d->derr)		out << "3";
 						else					out << "_";
 						d++;					
 					}
@@ -212,7 +299,6 @@ void Triangle_ColorCode2::printLattice(ostream& out) {
 }
 
 void Triangle_ColorCode2::printDualLattice(ostream& out) {
-	vector<int>::iterator x = dualcheck.begin();
 	vector<qubit>::iterator d = data.begin();
 	out << "1 means error" << endl;
 	int N = 3*nrows;

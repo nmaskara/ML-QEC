@@ -76,6 +76,7 @@ public:
 	int countQubitErrors();
 
 	virtual void genCorrPairErrs(double p, double k);
+	virtual void genDepolCorrPairErrs(double p, double k);
 	
 	// Determine if the correction produced a logical error (false)
 	virtual int checkCorrection();

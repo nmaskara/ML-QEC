@@ -73,9 +73,10 @@ void simpletest(string dirname = "", string filename = "") {
 	do {
 	ofstream out(dirname + filename + "_info.txt");
 	L.clear();
+	L.printLattice(cout);
 	//L.generateErrors(0.1);
 	//L.genCorrPairErrs(0.1,0.1);
-	L.generateDepolarizingErrors(0.01);
+	L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);
@@ -83,7 +84,6 @@ void simpletest(string dirname = "", string filename = "") {
 	//L.printErrors(cout);
 	cout << "Generated Errors" << endl;
 	L.printLattice(cout);	
-	L.printDualLattice(cout);
 
 	Decoder D;
 	//D.runDecode(L, dirname + filename + "_edges.txt", dirname + filename + "_matched.txt");
@@ -101,7 +101,6 @@ void simpletest(string dirname = "", string filename = "") {
 	//if (!save && L.getXerrors().size() == 0) remove(fname.c_str());
 	cout << "Applied Correction" << endl;
 	L.printLattice(cout);
-	L.printDualLattice(cout);
 	assert((L.getErrors()).size() == 0);
 	cout << "Correction: \t\t" << L.checkCorrection() << endl;
 	cout << "Dual Correction: \t" << L.checkDualCorrection() << endl;

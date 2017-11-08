@@ -17,6 +17,7 @@ using namespace std;
 class Triangle_ColorCode2 : public Base_Lattice {
 public:
 	vector<int> pathToBoundary(int i);
+	vector<int> getadj(int r, int c); 
 
 	// Helper functions
 	virtual int rctoi(int row, int col);
@@ -28,6 +29,7 @@ public:
 	virtual void applyCorrection(pairlist matching);
 
 	virtual void genCorrPairErrs(double p1, double p2);
+	virtual void genDepolCorrPairErrs(double p1, double p2);
 	virtual int checkCorrection();
 	virtual int checkDualCorrection();
 	virtual int calcDist(int i1, int i2);
