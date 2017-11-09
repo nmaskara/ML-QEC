@@ -68,21 +68,24 @@ for fil in os.listdir(direc):
 		print "UNKOWN TYPE : " + args[0]
 		sys.exit()
 	depol = False
-
-	if (args[4] == 'depol'):
-		depol = True
-		numcats *= 2
-		lsiz *= 2
-
 	pratio = 0
 	corr = False
-	if (args[4] == 'corr'):
-		pratio = int(args[5])
-		corr = True
+	i = 4
+	while (i < len(args)):
+		if (args[i] == 'depol'):
+			depol = True
+			numcats *= 2
+			lsiz *= 2
+
+		if (args[i] == 'corr'):
+			pratio = int(args[5])
+			corr = True
+			i += 1
+		i += 1
 
 
 	#for ptxt in np.arange(10, 200, 10):
-	for ptxt in range(5, 60, 5):
+	for ptxt in range(10, 180, 18):
 		p = float(ptxt) / 1000
 		print p
 		ptxt = str(ptxt)
