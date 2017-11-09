@@ -100,10 +100,10 @@ for fil in os.listdir(direc):
 		#	cmd += ' -c ' + str(args[5])
 
 		filename = 'data/' + '_'.join([args[0], args[1], datsz, ptxt])
-		if (depol):
-			filename += '_depol'
 		if (corr):
 			filename += '_corr_' + str(pratio)
+		if (depol):
+			filename += '_depol'
 		filename += '.csv'
 
 		if not os.path.exists(filename):
