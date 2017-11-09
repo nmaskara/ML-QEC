@@ -42,6 +42,9 @@ rem5c = getRem(model5c, indat, outdat)'''
 datsz = str(100000)
 direc = sys.argv[1]
 outfile = open(sys.argv[2], 'w')
+pstart = int(sys.argv[3])
+pend = int(sys.argv[4])
+inc = int(sys.argv[5])
 
 #start = float(sys.argv[3])
 #end = float(sys.argv[4])
@@ -85,7 +88,7 @@ for fil in os.listdir(direc):
 
 
 	#for ptxt in np.arange(10, 200, 10):
-	for ptxt in range(10, 180, 18):
+	for ptxt in range(pstart, pend, inc):
 		p = float(ptxt) / 1000
 		print p
 		ptxt = str(ptxt)
