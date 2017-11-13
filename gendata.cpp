@@ -4,6 +4,7 @@
 #include "Triangle.hpp"
 #include "Triangle_ColorCode.hpp"
 #include "Triangle_ColorCode2.hpp"
+#include "Twist.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
 #include <assert.h>
@@ -34,11 +35,12 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		L = new Triangle_ColorCode2(nrows, ncols);
 	else if (type == "surface")
 		L = new Lattice2(nrows, ncols);
+	else if (type == "twist")
+		L = new Twist(nrows, ncols);
 	else {
 		cout << "invalid type " << endl;
 		abort();
 	}
-
 	/*if (seed != -1) {
 		L->setSeed(seed);
 		cout << "seed: " << seed << endl;
@@ -64,7 +66,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		vector<int> errors = L->getCheck();
 		vector<int> zerrors = L->getDualCheck();
 		pairlist matching;
-		if (type != "cc" && type != "cc2")
+		if (type != "cc" && type != "cc2" && type != "twist")
 			matching = D.matchTopLeft(L->getErrors());
 		int result;
 		int dresult = 0;
@@ -102,12 +104,12 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		int numcat;
 		if (type == "cc")
 			numcat = 16;
-		else if (type == "surface" || type == "cc2")
+		else if (type == "surface" || type == "cc2" || type == "twist")
 			numcat = 2;
 		else
 			numcat = 4;
 
-		if (depol) {
+		if (depol || type == "twist") {
 			result = (dresult * numcat) + result;
 			numcat *= 2;
 		}

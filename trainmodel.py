@@ -118,7 +118,7 @@ def makeModel(input_size, num_nodes, hidden_layers, opt_type, numcat):
 
 def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepochs, modelpath, resultpath, valname, depol=False, trainfilename=None, initial_epoch=0 ):
 	insize = latsize * latsize
-	if (lattype == "cc2"):
+	if (lattype == "cc2" or lattype == "twist"):
 		nrows = latsize/2
 		insize = 3 * nrows * (nrows+1) / 2
 
@@ -130,10 +130,12 @@ def train(model, lattype, latsize, p, pratio, batchsize, stepsperepoch, numepoch
 		numcat = 2
 	elif (lattype == "cc2"):
 		numcat = 2
+	elif (lattype == "twist"):
+		numcat = 2
 	else:
 		numcat = 4
 
-	if (depol):
+	if (depol or lattype == "twist"):
 		insize *= 2
 		numcat *= 2
 
@@ -196,7 +198,7 @@ def getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers, batchs
 		"_" + str(batchsize) + "_" + opttype + cstr + ".csv"
 
 	insize = latsize * latsize
-	if (lattype == "cc2"):
+	if (lattype == "cc2" or lattype == "twist"):
 		nrows = latsize/2
 		insize = 3 * nrows * (nrows+1) / 2
 
@@ -208,10 +210,12 @@ def getModel(filename, lattype, latsize, opttype, numnodes, hiddenlayers, batchs
 		numcat = 2
 	elif (lattype == "cc2"):
 		numcat = 2
+	elif (lattype == "twist"):
+		numcat = 2
 	else:
 		numcat = 4
 
-	if (depol):
+	if (depol or lattype == "twist"):
 		insize *= 2
 		numcat *= 2
 

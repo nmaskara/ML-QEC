@@ -4,6 +4,7 @@
 #include "Triangle.hpp"
 #include "Triangle_ColorCode.hpp"
 #include "Triangle_ColorCode2.hpp"
+#include "Twist.hpp"
 #include "Hexagonal.hpp"
 #include "decoder.hpp"
 #include <assert.h>
@@ -64,9 +65,9 @@ void testnum() {
 
 
 void simpletest(string dirname = "", string filename = "") {
-	int nrows = 7;
-	int ncols = 7;
-	Triangle_ColorCode2 L(nrows, ncols);
+	int nrows = 3;
+	int ncols = 3;
+	Twist L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
 	
@@ -74,13 +75,14 @@ void simpletest(string dirname = "", string filename = "") {
 	ofstream out(dirname + filename + "_info.txt");
 	L.clear();
 	L.printLattice(cout);
+	L.generateDepolarizingErrors(0.1);
 	//L.generateErrors(0.1);
 	//L.genCorrPairErrs(0.1,0.1);
-	L.genDepolCorrPairErrs(0.00, 0.01);
+	//L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);
-	L.printDualLattice(out);
+	//L.printDualLattice(out);
 	//L.printErrors(cout);
 	cout << "Generated Errors" << endl;
 	L.printLattice(cout);	
@@ -111,6 +113,25 @@ void simpletest(string dirname = "", string filename = "") {
 int main(int argc, char** argv) {
 	simpletest();
 	//testnum();
+	/*Twist L(9,9);
+
+	for (int i = 0; i < L.ndats; i++) {
+		L.clear();
+		cout << "Apply Errors: " << i << endl;
+		//L.data[2].derr = 1;
+		L.data[i].err = 1;
+		L.data[i].derr = 1;
+		//L.generateErrors(0.1);
+		L.checkErrors();
+		//L.check[41] = 1;
+		L.printLattice(cout);
+		cout << "Apply Correction" << endl;
+		pairlist matching;
+		L.applyCorrection(matching);
+		L.checkErrors();
+		L.printLattice();
+		assert( L.getErrors().size() == 0);
+	}*/
 
 	/*Lattice L(10, 10);
 	int count = 0;

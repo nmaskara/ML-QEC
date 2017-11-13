@@ -64,7 +64,7 @@ public:
 
 	void generateDepolarizingErrors(double errRate);
 	//recalculate check matrix based on data array
-	void checkErrors();
+	virtual void checkErrors();
 	// manually set random seed
 	void setSeed(int seed);
 	// applies a matching to the lattice by connecting all qubits 
