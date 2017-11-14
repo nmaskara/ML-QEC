@@ -2,17 +2,17 @@
 
 lattype='twist'
 latsize=3
-p=0.15
-ptxt=150
+p=0.20
+ptxt=200
 opt='adam'
 
-batchsize=10000
+batchsize=1000
 numlayers=1
 numnodes=100
 datasize=-1
 valsize=100000
 steps=1000
-epochs=10
+epochs=5
 
 dt='cc2twist' #_'$(date '+%Y-%m-%d_%H-%M-%S')
 if [ ! -d 'models/'$dt ]; then
@@ -28,7 +28,7 @@ valname=$lattype'_'$latsize'_'$valsize'_'$ptxt
 dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
-for numnodes in 50 100
+for numnodes in 50
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt

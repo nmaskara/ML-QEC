@@ -118,7 +118,7 @@ void Base_Lattice::generateErrors(double errRate) {
 	for (qarray::iterator i = data.begin(); i != data.end(); i++ ){
 		double randval = (double) mtrand() / mtrand.max();
 		if (randval < errRate)
-			i->err = !(i->derr);
+			i->err = !(i->err);
 	}
 }
 

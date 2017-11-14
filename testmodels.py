@@ -58,6 +58,9 @@ for fil in os.listdir(direc):
 	if (args[0] == 'cc2'):
 		lsiz = 3 * (dist/2) * (dist/2 + 1) / 2
 		numcats = 2
+	elif (args[0] == 'twist'):
+		lsiz = 3 * (dist/2) * (dist/2 + 1)
+		numcats = 4
 	elif (args[0] == 'surface'):
 		numcats = 2
 		lsiz = dist * dist
@@ -75,7 +78,7 @@ for fil in os.listdir(direc):
 	corr = False
 	i = 4
 	while (i < len(args)):
-		if (args[i] == 'depol'):
+		if (args[i] == 'depol' and args[0] != 'twist'):
 			depol = True
 			numcats *= 2
 			lsiz *= 2

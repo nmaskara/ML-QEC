@@ -60,7 +60,7 @@ public:
 	// prints the error syndrome to the ostream specified
 	void printErrors(ostream& = cout);
 	// gnerate random errors with rate errRate
-	void generateErrors(double errRate);
+	virtual void generateErrors(double errRate);
 
 	void generateDepolarizingErrors(double errRate);
 	//recalculate check matrix based on data array
