@@ -121,7 +121,7 @@ void Base_Lattice::generateErrors(double errRate) {
 			i->err = !(i->err);
 		randval = (double) mtrand() / mtrand.max();
 		if (randval < errRate)
-			i->err = !(i->err);
+			i->derr = !(i->derr);
 	}
 }
 
