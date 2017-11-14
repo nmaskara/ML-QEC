@@ -87,7 +87,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 			L->checkErrors();
 			assert(L->getErrors().size() == 0);
 			result = L->checkCorrection();		
-			if (depol)	
+			if (depol || type == "twist")
 				dresult = L->checkDualCorrection();
 			assert(result == r2);
 			//L.printLattice();
