@@ -70,13 +70,12 @@ void simpletest(string dirname = "", string filename = "") {
 	Twist L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
-	
 	do {
 	ofstream out(dirname + filename + "_info.txt");
 	L.clear();
 	L.printLattice(cout);
-	L.generateDepolarizingErrors(0.1);
-	//L.generateErrors(0.1);
+	//L.generateDepolarizingErrors(0.1);
+	L.generateErrors(0.1);
 	//L.genCorrPairErrs(0.1,0.1);
 	//L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
@@ -106,13 +105,25 @@ void simpletest(string dirname = "", string filename = "") {
 	assert((L.getErrors()).size() == 0);
 	cout << "Correction: \t\t" << L.checkCorrection() << endl;
 	cout << "Dual Correction: \t" << L.checkDualCorrection() << endl;
-	} while (!L.checkCorrection() || !L.checkDualCorrection() );
+	} while (true || !L.checkCorrection() || !L.checkDualCorrection() );
 	L.printLattice(cout);
 }
 
 int main(int argc, char** argv) {
 	simpletest();
 	//testnum();
+	/*Twist L(5,5);
+	L.data[1].derr = 1;
+	L.checkErrors();
+	L.printLattice(cout);
+	pairlist matching;
+	L.applyCorrection(matching);
+	cout << "corrected" << endl;
+	L.checkErrors();
+	L.printLattice(cout);
+	cout << L.checkCorrection() << endl;
+	cout << L.checkDualCorrection() << endl;*/
+
 	/*Twist L(9,9);
 
 	for (int i = 0; i < L.ndats; i++) {

@@ -54,14 +54,23 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 		else if (randflag) p = (double) prate * mtrand() / mtrand.max();
 		else p = prate;
 		L->clear();
-		if (p2 == 0 && !depol)
+
+		if (p2 == 0 && !depol) {
 			L->generateErrors(p);
-		else if (p2 == 0 && depol)
+		}
+
+		else if (p2 == 0 && depol) {
 			L->generateDepolarizingErrors(p);
-		else if (p2 == 0 && !depol)
+		}
+
+		else if (p2 != 0 && !depol) {
 			L->genCorrPairErrs(p, p2);
-		else
+		}
+
+		else {
 			L->genDepolCorrPairErrs(p, p2);
+		}
+
 		L->checkErrors();
 		vector<int> errors = L->getCheck();
 		vector<int> zerrors = L->getDualCheck();
