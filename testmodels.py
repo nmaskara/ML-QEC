@@ -78,10 +78,11 @@ for fil in os.listdir(direc):
 	corr = False
 	i = 4
 	while (i < len(args)):
-		if (args[i] == 'depol' and args[0] != 'twist'):
+		if (args[i] == 'depol'):
 			depol = True
-			numcats *= 2
-			lsiz *= 2
+			if ( args[0] != 'twist'):
+				numcats *= 2
+				lsiz *= 2
 
 		if (args[i] == 'corr'):
 			pratio = int(args[5])
