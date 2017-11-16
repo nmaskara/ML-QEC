@@ -65,8 +65,8 @@ void testnum() {
 
 
 void simpletest(string dirname = "", string filename = "") {
-	int nrows = 3;
-	int ncols = 3;
+	int nrows = 7;
+	int ncols = 7;
 	Twist L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
