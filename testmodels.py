@@ -40,7 +40,7 @@ rem5b = getRem(model5b, indat, outdat)
 rem5c = getRem(model5c, indat, outdat)'''
 
 datsz = str(100000)
-direc = sys.argv[1]
+infile = sys.argv[1]
 outfile = open(sys.argv[2], 'w')
 pstart = int(sys.argv[3])
 pend = int(sys.argv[4])
@@ -50,7 +50,17 @@ inc = int(sys.argv[5])
 #end = float(sys.argv[4])
 #samples = int(sys.argv[5])
 
-for fil in os.listdir(direc):
+if (os.path.isdir(infile)):
+	files = os.listdir(infile)
+	direc = infile
+elif (os.path.isfile(infile)):
+	direc = os.path.dirname(infile)
+	files = [os.path.basename(infile)]
+else:
+	print "Invalid input file/direcory"
+	abort()
+
+for fil in files:
 	print fil
 	args = fil.split('_')
 	model = load_model(direc +'/' + fil)

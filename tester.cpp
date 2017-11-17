@@ -65,8 +65,8 @@ void testnum() {
 
 
 void simpletest(string dirname = "", string filename = "") {
-	int nrows = 7;
-	int ncols = 7;
+	int nrows = 9;
+	int ncols = 9;
 	Twist L(nrows, ncols);
 	if (dirname == "")	dirname = "logs/";
 	if (filename == "")	filename = "last";
@@ -75,7 +75,7 @@ void simpletest(string dirname = "", string filename = "") {
 	L.clear();
 	L.printLattice(cout);
 	//L.generateDepolarizingErrors(0.1);
-	L.generateErrors(0.1);
+	L.generateErrors(0.02);
 	//L.genCorrPairErrs(0.1,0.1);
 	//L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
@@ -105,16 +105,17 @@ void simpletest(string dirname = "", string filename = "") {
 	assert((L.getErrors()).size() == 0);
 	cout << "Correction: \t\t" << L.checkCorrection() << endl;
 	cout << "Dual Correction: \t" << L.checkDualCorrection() << endl;
-	} while (true || !L.checkCorrection() || !L.checkDualCorrection() );
+	} while (!L.checkCorrection() || !L.checkDualCorrection() );
 	L.printLattice(cout);
 }
 
 int main(int argc, char** argv) {
 	simpletest();
 	//testnum();
-	/*Twist L(5,5);
-	L.data[1].derr = 1;
+	/*Twist L(7,7);
+	L.data[9].derr = 1;
 	L.checkErrors();
+	//L.check[4] = 1;
 	L.printLattice(cout);
 	pairlist matching;
 	L.applyCorrection(matching);
