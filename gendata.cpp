@@ -106,7 +106,7 @@ void writeTestData(string fname, string type, int latsize, int numtrials, double
 
 		for (int i = 0; i < L->nerrs; i++) {
 			out << errors[i] << ", ";
-			if (depol) {
+			if (depol && type != "twist") {
 				out << zerrors[i] << ", ";
 			}
 		}

@@ -74,8 +74,8 @@ void simpletest(string dirname = "", string filename = "") {
 	ofstream out(dirname + filename + "_info.txt");
 	L.clear();
 	L.printLattice(cout);
-	//L.generateDepolarizingErrors(0.1);
-	L.generateErrors(0.2);
+	L.generateDepolarizingErrors(0.1);
+	//L.generateErrors(0.2);
 	//L.genCorrPairErrs(0.1,0.1);
 	//L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
@@ -110,9 +110,9 @@ void simpletest(string dirname = "", string filename = "") {
 }
 
 int main(int argc, char** argv) {
-	//simpletest();
+	simpletest();
 	//testnum();
-	Twist L(9,9);
+	/*Twist L(9,9);
 	L.data[6].derr = 1;
 	L.checkErrors();
 	//L.check[18] = 1;
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
 	L.checkErrors();
 	L.printLattice(cout);
 	cout << L.checkCorrection() << endl;
-	cout << L.checkDualCorrection() << endl;
+	cout << L.checkDualCorrection() << endl;*/
 
 	/*Twist L(9,9);
 
