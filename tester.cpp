@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
 	//simpletest();
 	//testnum();
 	Twist L(9,9);
-	L.data[1].derr = 1;
+	L.data[6].derr = 1;
 	L.checkErrors();
 	//L.check[18] = 1;
 	L.printLattice(cout);
