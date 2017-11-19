@@ -74,10 +74,10 @@ void simpletest(string dirname = "", string filename = "") {
 	ofstream out(dirname + filename + "_info.txt");
 	L.clear();
 	L.printLattice(cout);
-	L.generateDepolarizingErrors(0.1);
+	//L.generateDepolarizingErrors(0.1);
 	//L.generateErrors(0.2);
 	//L.genCorrPairErrs(0.1,0.1);
-	//L.genDepolCorrPairErrs(0.00, 0.01);
+	L.genDepolCorrPairErrs(0.00, 0.01);
 	L.checkErrors();
 	L.printErrors(out);
 	L.printLattice(out);

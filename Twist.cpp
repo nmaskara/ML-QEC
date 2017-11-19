@@ -155,176 +155,6 @@ vector<int> Twist::pathToBoundary(int index) {
 	return path;
 }
 
-/*vector<int> Twist::pathToBoundary(int index) {
-	vector<int> corr = itostab(index);
-	int section = corr[0];
-	int row = corr[1];
-	int col = corr[2];
-	vector<int> path;
-	if (row == nrows) {
-		// edge stabilizer, move back to face appropriately
-		if (section == 0) {
-			int i = stabtoi(section, row, col);
-			if (mX[1][i] != -1) 
-				path.push_back(mX[1][i]);
-			else if (mZ[1][i] != -1)
-				path.push_back(mZ[1][i]);
-			else{
-				cout << "CANNOT DETERMINE PATH from edge, NO m1" << endl;
-				abort();
-			}
-			if ( (nrows - col) % 2 == 1) {
-				row -= 1;
-				if (col < ncols-1)
-					col += 1;
-			}
-			else {
-				if (col == 0) {
-					section = 2;
-					row = nrows - 1;
-					col = 0;
-				}
-				else {
-					row = col - 1;
-					col = nrows - 1;
-				}
-			}
-		}
-		else if (section == 1) {
-			int i = stabtoi(section, row, col);
-			if (mX[0][i] != -1) 
-				path.push_back(mX[0][i]);
-			else if (mZ[1][i] != -1)
-				path.push_back(mZ[0][i]);
-			else{
-				cout << "CANNOT DETERMINE PATH from edge, NO m" << endl;
-				abort();
-			}
-			if ( (nrows - col) % 2 == 1) {
-				if (col == 0) {
-					section = 2;
-					row = 0;
-					col = nrows - 1;
-				}
-				else {
-					row -= 1;
-					col -= 1;
-				}
-			}
-			else {
-				row = col + 1;
-				col = nrows - 1;
-			}
-		}
-		else if (section == 2) {
-			int i = stabtoi(section, row, col);
-			if ( (nrows - col) % 2 == 1) {
-				if (mX[1][i] != -1) 
-					path.push_back(mX[1][i]);
-				else if (mZ[1][i] != -1)
-					path.push_back(mZ[1][i]);
-				else{
-					cout << "CANNOT DETERMINE PATH from edge, NO m1" << endl;
-					abort();
-				}
-				if (col < nrows - 1)
-					col += 1;
-				row = nrows - 1;
-			}
-			else {
-				if (mX[0][i] != -1) 
-					path.push_back(mX[0][i]);
-				else if (mZ[1][i] != -1)
-					path.push_back(mZ[0][i]);
-				else{
-					cout << "CANNOT DETERMINE PATH from edge, NO m" << endl;
-					abort();
-				}	
-				if (col < nrows - 1)
-					row = col + 1;
-				else
-					row = col;
-				col = nrows - 1;
-			}
-		}
-	}
-	while (section != 2 || row != nrows-1 || col != nrows-1) {
-		if (section == 0) {
-			int i = stabtoi(section, row, col);
-			// move diagonally, in the direction of m2
-			if (mX[2][i] != -1) 
-				path.push_back(mX[2][i]);
-			else if (mZ[2][i] != -1)
-				path.push_back(mZ[2][i]);
-			else{
-				cout << "CANNOT DETERMINE PATH, NO m2" << endl;
-				abort();
-			}
-			if (col < nrows - 1) {
-				col += 1;			
-			}	
-			if (row == 0) {
-				section = 2;
-				row = col;
-				col = 0;
-			}
-			else {
-				row -= 1;
-			}
-		}
-		else if (section == 1) {
-			int i = stabtoi(section, row, col);
-			// move diagonally, in the direction of m1
-			if (mX[1][i] != -1) 
-				path.push_back(mX[1][i]);
-			else if (mZ[1][i] != -1)
-				path.push_back(mZ[1][i]);
-			else{
-				cout << "CANNOT DETERMINE PATH, NO m1" << endl;
-				abort();
-			}
-			if (row < nrows - 1) {
-				row += 1;					
-			}
-			if (col == 0) {
-				section = 2;
-				col = row;
-				row = 0;
-			}
-			else {
-				col -= 1;					
-			}		
-		}
-		else if (section == 2) {
-			int i = stabtoi(section, row, col);
-			// move diagonally, in the direction of m1
-			if (mX[3][i] != -1) 
-				path.push_back(mX[3][i]);
-			else if (mZ[3][i] != -1)
-				path.push_back(mZ[3][i]);
-			else{
-				cout << "CANNOT DETERMINE PATH, NO m3" << endl;
-				abort();
-			}
-			if (row < nrows - 1){
-				row += 1;				
-			}
-			if (col < nrows - 1) {
-				col += 1;					
-			}	
-		}
-	}
-	int i = stabtoi(section, row, col);
-	if (mX[3][i] != -1) 
-		path.push_back(mX[3][i]);
-	else if (mZ[3][i] != -1)
-		path.push_back(mZ[3][i]);
-	else{
-		cout << "CANNOT DETERMINE PATH, NO m3" << endl;
-		abort();
-	}
-	return path;
-}*/
 
 void Twist::applyCorrection(pairlist matching) {
 	assert(matching.size() == 0);
@@ -349,18 +179,140 @@ void Twist::applyCorrection(pairlist matching) {
 			}
 		}
 	}
-	/*checkErrors();
-	errors = getErrors();
-	if (errors.size() > 0) {
-		//assert (errors.size() == 1);
-		data[ndats-1].derr = !data[ndats-1].derr;
-	}*/
+}
+
+
+vector<int> Twist::getAdjQub(int section, int r, int c) {
+	vector<int> adj;
+	assert(section != -1);
+	int s2 = (3 + section - 1) % 3;
+	int s1 = (section + 1) % 3;
+
+	assert(r < nrows);
+	assert(c <= nrows);
+
+
+	// r-1, same col
+	if (r == 0) {
+		if (c == 0)
+			adj.push_back(qubtoi(-1, 0, 0));
+		else
+			adj.push_back(qubtoi(s2, c-1, 0));
+	}
+	else {
+		adj.push_back(qubtoi(section, r-1, c));
+	}
+	// r, c-1
+	if (c == 0) {
+		adj.push_back(qubtoi(s1, 0, r+1));
+	}
+	else {
+		adj.push_back(qubtoi(section, r, c-1));
+	}
+	// r+1, c
+	if (r < nrows - 1)
+		adj.push_back(qubtoi(section, r+1, c));
+	// r, c+1
+	if (c < nrows) 
+		adj.push_back(qubtoi(section, r, c+1));
+	return adj;
+
 
 }
 
 void Twist::genCorrPairErrs(double p1, double p2) {
 
 }
+
+void Twist::genDepolCorrPairErrs(double p1, double p2) {
+	assert((p1 + p2) < 1);	
+	for (int i = 0; i < (int) data.size(); i++){
+		double randval = (double) mtrand() / mtrand.max();
+		if (randval < p1 / 3){
+			data[i].err = !data[i].err;
+		}
+		else if (randval < 2 * p1 / 3) {
+			data[i].err = !data[i].err;
+			data[i].derr = !data[i].derr;
+		}
+		else if (randval < p1) {
+			data[i].derr = !data[i].derr;
+		}
+		vector<int> corr = itoqub(i);
+		int s = corr[0];
+		int r = corr[1];
+		int c = corr[2];
+		if ( s != -1 && (r+c) % 2 == 0) {
+			// weight 2 errors
+			vector<int> adj = getAdjQub(s, r, c);
+			assert(adj.size() > 1);
+			for (uint k = 0; k < adj.size(); k++) {				
+				double randval = (double) mtrand() / mtrand.max();
+				if (randval < p2 / 9) {
+					// XX error
+					//cout << "XX" << endl;
+					data[i].err = !data[i].err;
+					data[adj[k]].err = !data[adj[k]].err;
+				}
+				else if (randval < 2 * p2 / 9) {
+					// XY error
+					//cout << "XY" << endl;
+					data[i].err = !data[i].err;
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+				else if (randval < 3 * p2 / 9) {
+					// XZ error
+					//cout << "XZ" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+				}
+				else if (randval < 4 * p2 / 9) {
+					// YX error
+					//cout << "YX" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+					data[adj[k]].err = !data[adj[k]].err;
+				}
+				else if (randval < 5 * p2 / 9) {
+					// YY error
+					//cout << "YY" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;		
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;			
+				}
+				else if (randval < 6 * p2 / 9) {
+					// YZ error
+					//cout << "YZ" << endl;
+					data[i].err = !data[i].err;
+					data[i].derr = !data[i].derr;
+					data[adj[k]].derr = !data[adj[k]].derr;						
+				}
+				else if (randval < 7 * p2 / 9) {
+					// ZX error
+					//cout << "ZX" << endl;
+					data[i].derr = !data[i].derr;						
+					data[adj[k]].err = !data[adj[k]].err;					
+				}
+				else if (randval < 8 * p2 / 9) {
+					// ZY error
+					//cout << "ZY" << endl;
+					data[i].derr = !data[i].derr;						
+					data[adj[k]].err = !data[adj[k]].err;
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+				else if (randval < p2){
+					// ZZ error
+					//cout << "ZZ" << endl;
+					data[i].derr = !data[i].derr;	
+					data[adj[k]].derr = !data[adj[k]].derr;
+				}
+			}	
+		}
+	}
+}
+
 int Twist::checkCorrection() {
 	int count = 0;
 	for (int i = 0; i <= nrows; i++) {

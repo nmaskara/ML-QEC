@@ -24,11 +24,14 @@ public:
 	int qubtoi(int x, int y, int z);
 	vector<int> itoqub(int i);
 
+	vector<int> getAdjQub(int section, int r, int c);
+
 	vector<vector<int>> paths;
 	virtual void checkErrors();
 
 	virtual void applyCorrection(pairlist matching);
 	virtual void genCorrPairErrs(double p1, double p2);
+	virtual void genDepolCorrPairErrs(double p1, double p2);
 	virtual int checkCorrection();
 	virtual int checkDualCorrection();
 	virtual int calcDist(int i1, int i2);
