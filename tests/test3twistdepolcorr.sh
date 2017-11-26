@@ -21,11 +21,11 @@ fi
 if [ ! -d 'results/'$dt ]; then
 	mkdir 'results/'$dt
 fi
-./gendata $lattype $latsize $valsize $p -d -c 1
-valname=$lattype'_'$latsize'_'$valsize'_'$ptxt'_corr_1_depol'
+./gendata $lattype $latsize $valsize $p -d -c -1
+valname=$lattype'_'$latsize'_'$valsize'_'$ptxt'_corr_-1_depol'
 
 #./gendata $lattype $latsize $datasize $p -c $pratio
-dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_corr_1_depol'
+dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_corr_-1_depol'
 #python csvtohdf5.py $dataname 
 #batchsize=$((datasize/1000))
 for numnodes in 50 100 200
