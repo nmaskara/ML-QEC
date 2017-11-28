@@ -52,13 +52,13 @@ def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads
 	setsize = str(setsize)
 	threadid = int(threadid)
 	tail = ''
-	if pratio > 0:
+	if pratio != 0:
 		tail += '_corr_' + str(pratio)
 	if (depol):
 		tail += '_depol'
 	inname = 'data/' + lattype + '_' + latsize + '_' + setsize + '_' + ptxt + '_' + str(threadid) + tail + '.csv'
 	flags = ' -s ' + str(random.randint(0, sys.maxint))
-	if pratio > 0:
+	if pratio != 0:
 		flags += ' -c ' + str(pratio)
 	if depol:
 		flags += ' -d '
@@ -383,7 +383,7 @@ if __name__ == "__main__":
 	filename = lattype + '_' + str(latsize) + '_' + str(datasize) + '_' + str(int(p*1000)) 
 	valname = lattype + '_' + str(latsize) + '_' + str(valsize) + '_' + str(int(p*1000))
 
-	if (pratio > 0):
+	if (pratio != 0):
 		filename += '_corr_' + str(pratio)
 		valname += '_corr_' + str(pratio)
 
