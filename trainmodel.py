@@ -62,6 +62,8 @@ def genset(lattype, latsize, p, pratio, setsize, threadid, dataqueue, numthreads
 		flags += ' -c ' + str(pratio)
 	if depol:
 		flags += ' -d '
+	print './gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p +\
+		 ' -i ' + str(threadid) + flags + ' > data.txt'
 	while True:
 		os.system('./gendata ' + lattype + ' ' + latsize + ' ' + setsize + ' ' + p +\
 		 ' -i ' + str(threadid) + flags + ' > data.txt')

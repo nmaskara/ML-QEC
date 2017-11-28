@@ -239,10 +239,10 @@ void Twist::genDepolCorrPairErrs(double p1, double p2) {
 				assert(adj.size() > 1);
 				for (uint k = 0; k < adj.size(); k++) {
 					double randval = (double) mtrand() / mtrand.max();	
-					double diff = randval - p1;
+					double diff = p1 - randval;
 					if (diff < 0)
 						continue;
-					int choice = 1 + int(diff * choices) / choices;
+					int choice = 1 + int(diff * choices / p1);
 					int achoice = choice / 4;
 					int bchoice = choice % 4;
 					if (achoice == 1) {

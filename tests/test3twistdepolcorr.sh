@@ -1,16 +1,16 @@
 #!/bin/bash -x
 
 lattype='twist'
-latsize=5
+latsize=3
 p=0.04
 ptxt=40
 opt='adam'
 
 batchsize=1000
-numlayers=3
+numlayers=1
 numnodes=100
 datasize=-1
-valsize=1000
+valsize=10000
 steps=1000
 epochs=50
 
