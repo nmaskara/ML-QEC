@@ -2,8 +2,8 @@
 
 lattype='twist'
 latsize=5
-p=0.06
-ptxt=60
+p=0.04
+ptxt=40
 opt='adam'
 
 batchsize=1000
@@ -31,7 +31,7 @@ dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_corr_-1_depol'
 for numnodes in 50 100 200
 do
 	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
-	$numlayers $batchsize $datasize $p $valsize $dt -d -c 1
+	$numlayers $batchsize $datasize $p $valsize $dt -d -c -1
 
 	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
 	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
