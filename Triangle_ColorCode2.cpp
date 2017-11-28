@@ -157,88 +157,140 @@ void Triangle_ColorCode2::genCorrPairErrs(double p1, double p2) {
 
 void Triangle_ColorCode2::genDepolCorrPairErrs(double p1, double p2) {
 	assert((p1 + p2) < 1);	
-	for (int i = 0; i < (int) data.size(); i++){
-		double randval = (double) mtrand() / mtrand.max();
-		if (randval < p1 / 3){
-			data[i].err = !data[i].err;
-		}
-		else if (randval < 2 * p1 / 3) {
-			data[i].err = !data[i].err;
-			data[i].derr = !data[i].derr;
-		}
-		else if (randval < p1) {
-			data[i].derr = !data[i].derr;
-		}
-		int r = itor(i);
-		int c = itoc(i);
-		if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {
-			// weight 2 errors
-			vector<int> adj = getadj(r, c);
-			for (uint k = 0; k < adj.size(); k++) {				
-				double randval = (double) mtrand() / mtrand.max();
-				if (randval < p2 / 9) {
-					// XX error
-					//cout << "XX" << endl;
-					data[i].err = !data[i].err;
-					data[adj[k]].err = !data[adj[k]].err;
+	if (p2 < 0) {
+		for (int i = 0; i < (int) data.size(); i++) {
+			int choices = 15;	//2 ** 4 - 1
+			int r = itor(i);
+			int c = itoc(i);
+			if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {		
+				// weight 2 errors
+				vector<int> adj = getadj(r,c);
+				assert(adj.size() > 0);
+				for (uint k = 0; k < adj.size(); k++) {
+
+					double randval = (double) mtrand() / mtrand.max();	
+					double diff = p1 - randval;
+					if (diff < 0)
+						continue;
+					int choice = 1 + int(diff * choices / p1);
+					int achoice = choice / 4;
+					int bchoice = choice % 4;
+
+					if (achoice == 1) {
+						data[i].err = !data[i].err;
+					}
+					else if (achoice == 2) {
+						data[i].derr = !data[i].derr;
+					}
+					else if (achoice == 3) {
+						data[i].err = !data[i].err;
+						data[i].derr = !data[i].derr;
+					}
+					else {
+						assert(achoice == 0 || achoice == 4);
+					}
+					if (bchoice == 1) {
+						data[adj[k]].err = !data[adj[k]].err;
+					}
+					else if (bchoice == 2) {
+						data[adj[k]].derr = !data[adj[k]].derr;
+					}
+					else if (bchoice == 3) {
+						data[adj[k]].err = !data[adj[k]].err;
+						data[adj[k]].derr = !data[adj[k]].derr;
+					}
+					else {
+						assert(bchoice == 0);
+					}
 				}
-				else if (randval < 2 * p2 / 9) {
-					// XY error
-					//cout << "XY" << endl;
-					data[i].err = !data[i].err;
-					data[adj[k]].err = !data[adj[k]].err;
-					data[adj[k]].derr = !data[adj[k]].derr;
-				}
-				else if (randval < 3 * p2 / 9) {
-					// XZ error
-					//cout << "XZ" << endl;
-					data[i].err = !data[i].err;
-					data[i].derr = !data[i].derr;
-				}
-				else if (randval < 4 * p2 / 9) {
-					// YX error
-					//cout << "YX" << endl;
-					data[i].err = !data[i].err;
-					data[i].derr = !data[i].derr;
-					data[adj[k]].err = !data[adj[k]].err;
-				}
-				else if (randval < 5 * p2 / 9) {
-					// YY error
-					//cout << "YY" << endl;
-					data[i].err = !data[i].err;
-					data[i].derr = !data[i].derr;		
-					data[adj[k]].err = !data[adj[k]].err;
-					data[adj[k]].derr = !data[adj[k]].derr;			
-				}
-				else if (randval < 6 * p2 / 9) {
-					// YZ error
-					//cout << "YZ" << endl;
-					data[i].err = !data[i].err;
-					data[i].derr = !data[i].derr;
-					data[adj[k]].derr = !data[adj[k]].derr;						
-				}
-				else if (randval < 7 * p2 / 9) {
-					// ZX error
-					//cout << "ZX" << endl;
-					data[i].derr = !data[i].derr;						
-					data[adj[k]].err = !data[adj[k]].err;					
-				}
-				else if (randval < 8 * p2 / 9) {
-					// ZY error
-					//cout << "ZY" << endl;
-					data[i].derr = !data[i].derr;						
-					data[adj[k]].err = !data[adj[k]].err;
-					data[adj[k]].derr = !data[adj[k]].derr;
-				}
-				else if (randval < p2){
-					// ZZ error
-					//cout << "ZZ" << endl;
-					data[i].derr = !data[i].derr;	
-					data[adj[k]].derr = !data[adj[k]].derr;
-				}
-			}	
+			}
 		}
 	}
+	else {
+		for (int i = 0; i < (int) data.size(); i++){
+			double randval = (double) mtrand() / mtrand.max();
+			if (randval < p1 / 3){
+				data[i].err = !data[i].err;
+			}
+			else if (randval < 2 * p1 / 3) {
+				data[i].err = !data[i].err;
+				data[i].derr = !data[i].derr;
+			}
+			else if (randval < p1) {
+				data[i].derr = !data[i].derr;
+			}
+			int r = itor(i);
+			int c = itoc(i);
+			if ( (r % 3 == 0 && c % 2 == 0) || (r % 3 != 0 && c % 2 == 1) ) {
+				// weight 2 errors
+				vector<int> adj = getadj(r, c);
+				for (uint k = 0; k < adj.size(); k++) {				
+					double randval = (double) mtrand() / mtrand.max();
+					if (randval < p2 / 9) {
+						// XX error
+						//cout << "XX" << endl;
+						data[i].err = !data[i].err;
+						data[adj[k]].err = !data[adj[k]].err;
+					}
+					else if (randval < 2 * p2 / 9) {
+						// XY error
+						//cout << "XY" << endl;
+						data[i].err = !data[i].err;
+						data[adj[k]].err = !data[adj[k]].err;
+						data[adj[k]].derr = !data[adj[k]].derr;
+					}
+					else if (randval < 3 * p2 / 9) {
+						// XZ error
+						//cout << "XZ" << endl;
+						data[i].err = !data[i].err;
+						data[i].derr = !data[i].derr;
+					}
+					else if (randval < 4 * p2 / 9) {
+						// YX error
+						//cout << "YX" << endl;
+						data[i].err = !data[i].err;
+						data[i].derr = !data[i].derr;
+						data[adj[k]].err = !data[adj[k]].err;
+					}
+					else if (randval < 5 * p2 / 9) {
+						// YY error
+						//cout << "YY" << endl;
+						data[i].err = !data[i].err;
+						data[i].derr = !data[i].derr;		
+						data[adj[k]].err = !data[adj[k]].err;
+						data[adj[k]].derr = !data[adj[k]].derr;			
+					}
+					else if (randval < 6 * p2 / 9) {
+						// YZ error
+						//cout << "YZ" << endl;
+						data[i].err = !data[i].err;
+						data[i].derr = !data[i].derr;
+						data[adj[k]].derr = !data[adj[k]].derr;						
+					}
+					else if (randval < 7 * p2 / 9) {
+						// ZX error
+						//cout << "ZX" << endl;
+						data[i].derr = !data[i].derr;						
+						data[adj[k]].err = !data[adj[k]].err;					
+					}
+					else if (randval < 8 * p2 / 9) {
+						// ZY error
+						//cout << "ZY" << endl;
+						data[i].derr = !data[i].derr;						
+						data[adj[k]].err = !data[adj[k]].err;
+						data[adj[k]].derr = !data[adj[k]].derr;
+					}
+					else if (randval < p2){
+						// ZZ error
+						//cout << "ZZ" << endl;
+						data[i].derr = !data[i].derr;	
+						data[adj[k]].derr = !data[adj[k]].derr;
+					}
+				}	
+			}
+		}	
+	}
+	
 }
 
 void Triangle_ColorCode2::printLattice(ostream& out) {

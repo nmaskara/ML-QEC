@@ -238,6 +238,7 @@ void Twist::genDepolCorrPairErrs(double p1, double p2) {
 				vector<int> adj = getAdjQub(s, r, c);
 				assert(adj.size() > 1);
 				for (uint k = 0; k < adj.size(); k++) {
+
 					double randval = (double) mtrand() / mtrand.max();	
 					double diff = p1 - randval;
 					if (diff < 0)
@@ -245,6 +246,7 @@ void Twist::genDepolCorrPairErrs(double p1, double p2) {
 					int choice = 1 + int(diff * choices / p1);
 					int achoice = choice / 4;
 					int bchoice = choice % 4;
+
 					if (achoice == 1) {
 						data[i].err = !data[i].err;
 					}
@@ -256,7 +258,7 @@ void Twist::genDepolCorrPairErrs(double p1, double p2) {
 						data[i].derr = !data[i].derr;
 					}
 					else {
-						assert(achoice == 0);
+						assert(achoice == 0 || achoice == 4);
 					}
 					if (bchoice == 1) {
 						data[adj[k]].err = !data[adj[k]].err;
