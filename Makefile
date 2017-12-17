@@ -1,14 +1,15 @@
-OBJS = Lattice.o decoder.o Base_Lattice.o Triangle.o Hexagonal.o Triangle_ColorCode.o Lattice2.o Triangle_ColorCode2.o Twist.o
+SRC = src
+OBJS = src/Lattice.o src/decoder.o src/Base_Lattice.o src/Triangle.o src/Hexagonal.o src/Triangle_ColorCode.o src/Lattice2.o src/Triangle_ColorCode2.o src/Twist.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -O2 -c $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
 
-all: $(OBJS) tester.o runtest.o gendata.o genopendata.o
-	$(CC) $(LFLAGS) -o tester $(OBJS) tester.o
-	$(CC) $(LFLAGS) -o gendata $(OBJS) gendata.o
-	$(CC) $(LFLAGS) -o genopendata $(OBJS) genopendata.o
-	$(CC) $(LFLAGS) -o runtest $(OBJS) runtest.o
+all: $(OBJS) src/tester.o src/runtest.o src/gendata.o src/genopendata.o
+	$(CC) $(LFLAGS) -o tester $(OBJS) src/tester.o
+	$(CC) $(LFLAGS) -o gendata $(OBJS) src/gendata.o
+	$(CC) $(LFLAGS) -o genopendata $(OBJS) src/genopendata.o
+	$(CC) $(LFLAGS) -o runtest $(OBJS) src/runtest.o
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $<
@@ -17,4 +18,4 @@ all: $(OBJS) tester.o runtest.o gendata.o genopendata.o
 	$(CC) $(CFLAGS) $<
 	
 clean:
-	rm $(OBJS) tester.o runtest.o gendata.o
+	rm $(OBJS) tester.o runtest.o gendata.o genopendata.o
