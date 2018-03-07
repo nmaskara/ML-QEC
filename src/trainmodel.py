@@ -401,9 +401,12 @@ if __name__ == "__main__":
 	initial_epoch = 0
 	if (new):
 		print "Starting pre-training"
-		train(model, lattype, latsize, p*0.2, pratio, batchsize, stepsperepoch, 1, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
-		train(model, lattype, latsize, p*0.4, pratio, batchsize, stepsperepoch, 1, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+		train(model, lattype, latsize, p*0.2, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+		train(model, lattype, latsize, p*0.3, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+		train(model, lattype, latsize, p*0.4, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+		train(model, lattype, latsize, p*0.5, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 		train(model, lattype, latsize, p*0.6, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
+		train(model, lattype, latsize, p*0.7, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 		train(model, lattype, latsize, p*0.8, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 		train(model, lattype, latsize, p*0.9, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)
 		train(model, lattype, latsize, p*0.95, pratio, batchsize, stepsperepoch, 2, modelpath, resultpath, valname, depol=depol, trainfilename=filename, initial_epoch=initial_epoch)

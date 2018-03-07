@@ -30,14 +30,14 @@ dataname=$lattype'_'$latsize'_'$datasize'_'$ptxt'_depol'
 #batchsize=$((datasize/1000))
 for numnodes in 400 600
 do
-	python trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
+	python src/trainmodel.py $lattype $opt $latsize $steps $epochs $numnodes \
 	$numlayers $batchsize $datasize $p $valsize $dt -d
 
 	aws s3 cp 'models/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5' \
 	s3://nmaskara-models/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.hdf5'
 
 	aws s3 cp 'results/'$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv' \
-	s3://nmaskara-models/results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv'
+	s3://nmaskara-results/$dt'/'$dataname'_'$numnodes'_'$numlayers'_'$batchsize'_'$opt'.csv'
 done
 
 echo 'done'
